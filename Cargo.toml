@@ -1,0 +1,12 @@
+[package]
+name = "rust_ray_tracer"
+version = "0.1.0"
+authors = ["Paul Jarrett"]
+doc = false
+
+[dependencies]
+image = "0.10.3"
+
+[lib]
+name = "rrt"
+path = "src/lib.rs"
