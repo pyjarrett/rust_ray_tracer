@@ -1,9 +1,10 @@
-#![macro_use]
+use std::ops::{Add, Sub, Mul, Div, Neg, Index};
+use math::Axis;
 
-use std::ops::{Add, Sub, Mul, Neg};
+const MIN_LENGTH_FOR_NORMALIZATION: f32 = 1e-6;
 
-#[derive(Clone,Copy)]
 /// 3D type for vectors and points.
+#[derive(Clone,Copy)]
 pub struct Vector {
     pub x: f32,
     pub y: f32,
@@ -16,20 +17,33 @@ impl Vector {
     }
 
     pub fn length(&self) -> f32 {
-        return (self.x * self.x + self.y * self.y + self.z * self.z).sqrt();
+        self.dot(*self).sqrt()
     }
 
     /// Possibly normalizes the vector.
     pub fn normalize(&mut self) -> Result<f32, ()> {
         let len = self.length();
         let inv_len = 1.0 / len;
-        if len > 1e-6 {
+        if len > MIN_LENGTH_FOR_NORMALIZATION {
             self.x = self.x * inv_len;
             self.y = self.y * inv_len;
             self.z = self.z * inv_len;
             return Ok(self.length());
         }
         return Err(());
+    }
+
+    pub fn dot(&self, v: Vector) -> f32 {
+        self.x * v.x + self.y * v.y + self.z * v.z
+    }
+
+    /// The angle between two vectors in degrees in the range [0, 180].
+    pub fn angle_with_in_degrees(&self, v: Vector) -> f32 {
+        let mut a = self.clone();
+        let mut b = v.clone();
+        a.normalize().unwrap();
+        b.normalize().unwrap();
+        a.dot(b).acos().to_degrees()
     }
 }
 
@@ -62,6 +76,13 @@ impl Mul<Vector> for f32 {
     }
 }
 
+impl Div<f32> for Vector {
+    type Output = Vector;
+    fn div(self, rhs: f32) -> Vector {
+        Vector::new(self.x / rhs, self.y / rhs, self.z / rhs)
+    }
+}
+
 impl Neg for Vector {
     type Output = Vector;
     fn neg(self) -> Self::Output {
@@ -69,10 +90,24 @@ impl Neg for Vector {
     }
 }
 
+/// Allows indexing for X, Y, and Z components.
+impl Index<Axis> for Vector {
+    type Output = f32;
+    fn index(&self, index: Axis) -> &Self::Output {
+        match index {
+            Axis::X => &self.x,
+            Axis::Y => &self.y,
+            Axis::Z => &self.z,
+        }
+    }
+}
 
+
+#[cfg(test)]
 mod test {
     use super::Vector;
     use math::util::assert_approx_eq;
+    use math::util::assert_eq_eps;
 
     #[test]
     fn test_vector_length() {
@@ -95,6 +130,43 @@ mod test {
     }
 
     #[test]
+    fn test_vector_fails_normalization() {
+        let mut v1 = Vector::new(0.0, 0.0, 0.0);
+        assert!(v1.normalize().is_err());
+    }
+
+    #[test]
+    fn test_angle_in_degrees() {
+        let x = Vector::new(1.0, 0.0, 0.0);
+        let y = Vector::new(0.0, 1.0, 0.0);
+        let z = Vector::new(0.0, 0.0, 1.0);
+
+        assert_eq_eps(x.angle_with_in_degrees(x), 0.0, 0.001);
+        assert_eq_eps(x.angle_with_in_degrees(-x), 180.0, 0.001);
+        assert_eq_eps((-x).angle_with_in_degrees(x), 180.0, 0.001);
+
+        assert_eq_eps(y.angle_with_in_degrees(y), 0.0, 0.001);
+        assert_eq_eps(y.angle_with_in_degrees(-y), 180.0, 0.001);
+        assert_eq_eps((-y).angle_with_in_degrees(y), 180.0, 0.001);
+
+        assert_eq_eps(z.angle_with_in_degrees(z), 0.0, 0.001);
+        assert_eq_eps(z.angle_with_in_degrees(-z), 180.0, 0.001);
+        assert_eq_eps((-z).angle_with_in_degrees(z), 180.0, 0.001);
+
+        assert_eq_eps(x.angle_with_in_degrees(y), 90.0, 0.001);
+        assert_eq_eps(x.angle_with_in_degrees(-y), 90.0, 0.001);
+
+        assert_eq_eps(y.angle_with_in_degrees(x), 90.0, 0.001);
+        assert_eq_eps(y.angle_with_in_degrees(-x), 90.0, 0.001);
+
+        assert_eq_eps(z.angle_with_in_degrees(y), 90.0, 0.001);
+        assert_eq_eps(z.angle_with_in_degrees(-y), 90.0, 0.001);
+
+        assert_eq_eps(z.angle_with_in_degrees(x), 90.0, 0.001);
+        assert_eq_eps(z.angle_with_in_degrees(-x), 90.0, 0.001);
+    }
+
+    #[test]
     fn test_vector_add() {
         let v1 = Vector::new(1.0, 2.0, 3.0);
         let v2 = Vector::new(4.0, 5.0, 6.0);
@@ -114,7 +186,6 @@ mod test {
         assert_approx_eq(v3.z, 5.0);
     }
 
-
     #[test]
     fn test_vector_mul() {
         let v1 = Vector::new(1.0, 2.0, 3.0);
@@ -125,9 +196,21 @@ mod test {
     }
 
     #[test]
+    fn test_vector_div() {
+        let v1 = Vector::new(10.0, 12.0, 0.0);
+        let v2 = v1 / 2.0;
+        assert_approx_eq(v2.x, 5.0);
+        assert_approx_eq(v2.y, 6.0);
+        assert_approx_eq(v2.z, 0.0);
+    }
+
+    #[test]
     fn test_vector_neg() {
         let v1 = Vector::new(1.0, -2.0, 0.0);
         let v2 = -v1;
+        assert_approx_eq(v1.x, 1.0);
+        assert_approx_eq(v1.y, -2.0);
+        assert_approx_eq(v1.z, 0.0);
         assert_approx_eq(v2.x, -1.0);
         assert_approx_eq(v2.y, 2.0);
         assert_approx_eq(v2.z, 0.0);

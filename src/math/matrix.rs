@@ -191,6 +191,7 @@ impl Mul for Matrix4x4 {
     }
 }
 
+// TODO: Perform the w divide.
 impl Mul<Point> for Matrix4x4 {
     type Output = Point;
     fn mul(self, p: Point) -> Self::Output {
@@ -203,6 +204,7 @@ impl Mul<Point> for Matrix4x4 {
     }
 }
 
+#[cfg(test)]
 mod test {
     use super::Matrix4x4;
     use math::Point;
@@ -220,7 +222,6 @@ mod test {
         assert!(m_inv == m);
         assert!(m_inv * m == m * m_inv);
     }
-
 
     #[test]
     pub fn test_translate_point() {
