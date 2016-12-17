@@ -118,9 +118,8 @@ impl fmt::Display for Matrix4x4 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut res = write!(f, "\n");
         for row in 0..4 {
-            // TODO: Add spacing w/ # of decimals.
             res = write!(f,
-                         "{} {} {} {}\n",
+                         "{:>8.4} {:>8.4} {:>8.4} {:>8.4}\n",
                          self.m[row][0],
                          self.m[row][1],
                          self.m[row][2],
