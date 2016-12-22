@@ -1,5 +1,6 @@
 use math::Point;
 use math::Vector;
+use std::fmt;
 
 #[derive(Clone,Copy)]
 pub struct Ray {
@@ -17,6 +18,11 @@ impl Ray {
     }
 }
 
+impl fmt::Display for Ray {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Origin {} Direction {}", self.origin, self.direction)
+    }
+}
 
 #[cfg(test)]
 mod test {

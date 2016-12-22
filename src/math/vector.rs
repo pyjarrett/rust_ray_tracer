@@ -1,4 +1,5 @@
 use std::ops::{Add, Sub, Mul, Div, Neg, Index};
+use std::fmt;
 use math::Axis;
 
 const MIN_LENGTH_FOR_NORMALIZATION: f32 = 1e-6;
@@ -99,6 +100,12 @@ impl Index<Axis> for Vector {
             Axis::Y => &self.y,
             Axis::Z => &self.z,
         }
+    }
+}
+
+impl fmt::Display for Vector {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[ {:>7.4} {:>7.4} {:>7.4} ]", self.x, self.y, self.z)
     }
 }
 

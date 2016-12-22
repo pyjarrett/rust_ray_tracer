@@ -1,5 +1,6 @@
 use std::cmp::Eq;
-use std::ops::{Add, Sub, Index};
+use std::fmt;
+use std::ops::{Add, Sub, Mul, Index};
 use math::{Axis, Vector};
 
 #[derive(Copy,Clone)]
@@ -61,6 +62,13 @@ impl PartialEq for Point {
 }
 
 impl Eq for Point {}
+
+
+impl fmt::Display for Point {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[ {:>7.4} {:>7.4} {:>7.4} ]", self.x, self.y, self.z)
+    }
+}
 
 
 #[cfg(test)]
