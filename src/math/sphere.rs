@@ -9,6 +9,13 @@ pub struct Sphere {
 
 
 impl Sphere {
+    pub fn new(origin: Point, radius: f32) -> Sphere {
+        Sphere {
+            origin: origin,
+            radius: radius,
+        }
+    }
+
     pub fn intersection_time(&self, a_ray: Ray) -> Option<f32> {
         let mut r = a_ray;
         r.normalize().unwrap();
@@ -30,8 +37,11 @@ impl Sphere {
         }
 
         // Determine half-chord distance.
-        let t_sqrd_half_chord = sqrd_radius -
-                                (sqrd_distance_to_center - t_closest_approach * t_closest_approach);
+        let t_sqrd_half_chord = sqrd_radius - sqrd_distance_to_center +
+                                t_closest_approach * t_closest_approach;
+        if t_sqrd_half_chord < 0.0 {
+            return None;
+        }
         if inside_sphere {
             return Some(t_closest_approach + t_sqrd_half_chord.sqrt());
         } else {
