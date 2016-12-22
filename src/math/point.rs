@@ -42,6 +42,17 @@ impl Sub for Point {
     }
 }
 
+impl Mul<Point> for f32 {
+    type Output = Point;
+    fn mul(self, p: Point) -> Point {
+        Point {
+            x: self * p.x,
+            y: self * p.y,
+            z: self * p.z,
+        }
+    }
+}
+
 impl Index<Axis> for Point {
     type Output = f32;
     fn index(&self, index: Axis) -> &Self::Output {
