@@ -124,6 +124,9 @@ impl fmt::Display for Matrix4x4 {
                          self.m[row][1],
                          self.m[row][2],
                          self.m[row][3]);
+            if res.is_err() {
+                return res;
+            }
         }
         res
     }
