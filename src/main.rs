@@ -4,7 +4,7 @@ use std::f32;
 use std::path::Path;
 
 mod math;
-use math::{Point, Sphere, Vector};
+use math::{Intersection, Point, Solid, Sphere, Vector};
 
 mod scene;
 use scene::{AngleUnit, Camera, Film, Perspective, Rectangle};
@@ -33,9 +33,8 @@ fn main() {
 
     for (x, y, pixel) in image.enumerate_pixels_mut() {
         let ray = camera.generate_ray(x, y);
-        let intersection_normal = sphere.intersection_normal(ray);
-        if let Some(n) = intersection_normal {
-            *pixel = image::Rgb(unit_vector_as_color(n));
+        if let Some(intersection) = sphere.intersect(&ray) {
+            *pixel = image::Rgb(unit_vector_as_color(intersection.normal));
         } else {
             *pixel = image::Rgb([0, 0, 0]);
         }
