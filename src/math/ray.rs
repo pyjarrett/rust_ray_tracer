@@ -13,7 +13,11 @@ impl Ray {
         self.direction.normalize()
     }
 
-    pub fn at(self, t: f32) -> Point {
+    pub fn is_normalized(&self) -> bool {
+        self.direction.is_normalized()
+    }
+
+    pub fn at(&self, t: f32) -> Point {
         self.origin + t * self.direction
     }
 }

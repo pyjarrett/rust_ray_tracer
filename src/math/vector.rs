@@ -3,6 +3,7 @@ use std::fmt;
 use math::Axis;
 
 const MIN_LENGTH_FOR_NORMALIZATION: f32 = 1e-6;
+const NORMALIZED_EPS: f32 = 1e-6;
 
 /// 3D type for vectors and points.
 #[derive(Clone,Copy)]
@@ -32,6 +33,10 @@ impl Vector {
             return Ok(self.length());
         }
         return Err(());
+    }
+
+    pub fn is_normalized(&self) -> bool {
+        (self.length() - 1.0).abs() < NORMALIZED_EPS
     }
 
     pub fn dot(&self, v: Vector) -> f32 {

@@ -1,6 +1,7 @@
 use math::Point;
 use math::Ray;
 use math::Vector;
+use math::{Intersection, Solid};
 
 pub struct Sphere {
     origin: Point,
@@ -63,10 +64,30 @@ impl Sphere {
     }
 }
 
+impl Solid for Sphere {
+    fn intersect(&self, r: &Ray) -> Option<Intersection> {
+        assert!(r.is_normalized());
+        if let Some(time) = self.intersection_time(*r) {
+            let point = r.at(time);
+            let mut normal = r.at(time) - self.origin;
+            normal.normalize().unwrap();
+
+            Some(Intersection {
+                time: time,
+                point: point,
+                normal: normal,
+            })
+        } else {
+            None
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod test {
     use super::Sphere;
+    use math::Solid;
     use math::Point;
     use math::Ray;
     use math::Vector;
@@ -85,22 +106,33 @@ mod test {
         };
         r.normalize().unwrap();
 
+        let intersection = s.intersect(&r).unwrap();
+
         let expected_t = 3.744; //3.7434776; //3.744 per intro book.
         let expected_intersection_point = Point::new(1.816, -0.368, 2.269);
         let expected_normal = Vector::new(-0.395, -0.123, -0.91);
 
         let t_intersection = s.intersection_time(r).unwrap();
         assert_eq_eps(expected_t, t_intersection, 0.01);
+        assert_eq_eps(expected_t, intersection.time, 0.01);
 
         // Use expected_t here to reduce impact of carried error.
         assert_eq_eps(expected_intersection_point.x, r.at(expected_t).x, 0.01);
         assert_eq_eps(expected_intersection_point.y, r.at(expected_t).y, 0.01);
         assert_eq_eps(expected_intersection_point.z, r.at(expected_t).z, 0.01);
+        assert_eq_eps(expected_intersection_point.x, intersection.point.x, 0.01);
+        assert_eq_eps(expected_intersection_point.y, intersection.point.y, 0.01);
+        assert_eq_eps(expected_intersection_point.z, intersection.point.z, 0.01);
 
         // assert!(expected_intersection_point == r.at(expected_t));
         let intersection_normal = s.intersection_normal(r).unwrap();
         assert_eq_eps(expected_normal.x, intersection_normal.x, 0.01);
         assert_eq_eps(expected_normal.y, intersection_normal.y, 0.01);
         assert_eq_eps(expected_normal.z, intersection_normal.z, 0.01);
+
+        assert!(intersection.normal.is_normalized());
+        assert_eq_eps(expected_normal.x, intersection.normal.x, 0.01);
+        assert_eq_eps(expected_normal.y, intersection.normal.y, 0.01);
+        assert_eq_eps(expected_normal.z, intersection.normal.z, 0.01);
     }
 }
