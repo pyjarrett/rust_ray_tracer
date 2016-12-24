@@ -93,12 +93,12 @@ impl Film {
         BasicRectangle::<f32>::new(w, h)
     }
 
-    pub fn raster_to_screen(&self) -> Matrix4x4 {
-        self.raster_to_screen
+    pub fn raster_to_screen(&self) -> &Matrix4x4 {
+        &self.raster_to_screen
     }
 
-    pub fn screen_to_raster(&self) -> Matrix4x4 {
-        self.screen_to_raster
+    pub fn screen_to_raster(&self) -> &Matrix4x4 {
+        &self.screen_to_raster
     }
 }
 
@@ -112,14 +112,15 @@ impl Rectangle<u16> for Film {
     }
 }
 
+/// Provides units for angles.
 pub enum AngleUnit {
     Radians,
     Degrees,
 }
 
 pub trait Projection {
-    fn screen_to_camera(&self) -> Matrix4x4;
-    fn camera_to_screen(&self) -> Matrix4x4;
+    fn screen_to_camera(&self) -> &Matrix4x4;
+    fn camera_to_screen(&self) -> &Matrix4x4;
 }
 
 pub struct Perspective {
@@ -154,12 +155,12 @@ impl Perspective {
 }
 
 impl Projection for Perspective {
-    fn screen_to_camera(&self) -> Matrix4x4 {
-        self.screen_to_camera
+    fn screen_to_camera(&self) -> &Matrix4x4 {
+        &self.screen_to_camera
     }
 
-    fn camera_to_screen(&self) -> Matrix4x4 {
-        self.camera_to_screen
+    fn camera_to_screen(&self) -> &Matrix4x4 {
+        &self.camera_to_screen
     }
 }
 
