@@ -1,13 +1,10 @@
-use math::Point;
-use math::Ray;
-use math::Vector;
-use math::{Intersection, Solid};
+use math::{Intersection, Point, Ray, Solid, Vector};
 
+/// A sphere type centered at a specific origin.
 pub struct Sphere {
     origin: Point,
     radius: f32,
 }
-
 
 impl Sphere {
     pub fn new(origin: Point, radius: f32) -> Sphere {
@@ -20,14 +17,13 @@ impl Sphere {
     pub fn intersection_time(&self, a_ray: Ray) -> Option<f32> {
         let mut r = a_ray;
         r.normalize().unwrap();
-        // Find if ray is inside the sphere.
-        // Normalize the ray
 
-        // TODO: Translate ray into world coordinates.
+        // Set up basic relations.
         let origin_to_center = self.origin - r.origin;
         let sqrd_distance_to_center = origin_to_center.dot(origin_to_center);
         let sqrd_radius = self.radius * self.radius;
 
+        // Find if ray is inside the sphere.
         let inside_sphere = sqrd_distance_to_center < sqrd_radius;
 
         let t_closest_approach = origin_to_center.dot(r.direction);
@@ -49,7 +45,6 @@ impl Sphere {
             return Some(t_closest_approach - t_sqrd_half_chord.sqrt());
         }
     }
-    // pub fn intersection_point(r: &Ray) -> Option<Point>
 
     pub fn intersection_normal(&self, r: Ray) -> Option<Vector> {
         match self.intersection_time(r) {
@@ -66,10 +61,11 @@ impl Sphere {
 
 impl Solid for Sphere {
     fn intersect(&self, r: &Ray) -> Option<Intersection> {
-        assert!(r.is_normalized());
+        debug_assert!(r.is_normalized());
+
         if let Some(time) = self.intersection_time(*r) {
             let point = r.at(time);
-            let mut normal = r.at(time) - self.origin;
+            let mut normal = point - self.origin;
             normal.normalize().unwrap();
 
             Some(Intersection {
@@ -87,10 +83,7 @@ impl Solid for Sphere {
 #[cfg(test)]
 mod test {
     use super::Sphere;
-    use math::Solid;
-    use math::Point;
-    use math::Ray;
-    use math::Vector;
+    use math::{Point, Ray, Solid, Vector};
     use math::util::assert_eq_eps;
 
     #[test]
