@@ -31,10 +31,25 @@ fn main() {
     let sphere = Sphere::new(Point::new(0.0, 0.0, 10.0), 2.0);
     let origin = Point::new(0.0, 0.0, 0.0);
 
+    let mut light_direction = Vector::new(10.0, 10.0, -10.0);
+
     for (x, y, pixel) in image.enumerate_pixels_mut() {
         let ray = camera.generate_ray(x, y);
         if let Some(intersection) = sphere.intersect(&ray) {
-            *pixel = image::Rgb(unit_vector_as_color(intersection.normal));
+            let normal = intersection.normal;
+            assert!(normal.is_normalized());
+            light_position.normalize().unwrap();
+            // Dot between normal and light position to get basic lambertian shading.
+            let shade = normal.dot(light_position);
+            if shade > 0.0 {
+                *pixel = image::Rgb([(shade * 255.0) as u8,
+                                     (shade * 255.0) as u8,
+                                     (shade * 255.0) as u8]);
+            } else {
+                image::Rgb([0, 0, 0]);
+            }
+            // Color like a normal map.
+            // *pixel = image::Rgb(unit_vector_as_color(intersection.normal));
         } else {
             *pixel = image::Rgb([0, 0, 0]);
         }
