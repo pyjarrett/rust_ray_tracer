@@ -18,6 +18,16 @@ impl Vector {
         Vector { x: x, y: y, z: z }
     }
 
+    /// Creates a vector and then normalizes it.
+    /// Returns an error if the vector cannot assume unit length.
+    pub fn unit(x: f32, y: f32, z: f32) -> Result<Vector, ()> {
+        let mut v = Vector::new(x, y, z);
+        match v.normalize() {
+            Ok(_) => Ok(v),
+            Err(_) => Err(()),
+        }
+    }
+
     pub fn length(&self) -> f32 {
         self.dot(*self).sqrt()
     }
