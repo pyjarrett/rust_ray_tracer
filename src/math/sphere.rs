@@ -14,6 +14,15 @@ impl Sphere {
         }
     }
 
+    /// Creates a sphere of given radius at the origin.
+    pub fn new_with_radius(radius: f32) -> Sphere {
+        assert!(radius >= 0.0);
+        Sphere {
+            origin: Point::new(0.0, 0.0, 0.0),
+            radius: radius,
+        }
+    }
+
     pub fn intersection_time(&self, a_ray: Ray) -> Option<f32> {
         let mut r = a_ray;
         r.normalize().unwrap();
