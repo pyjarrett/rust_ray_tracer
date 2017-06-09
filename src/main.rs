@@ -28,8 +28,8 @@ fn main() {
     let mut image = image::ImageBuffer::new(film.width() as u32, film.height() as u32);
     let camera = Camera::new(&film, &projection);
 
-    let sphere = Sphere::new_with_radius(2.0);
-    let origin = Point::new(0.0, 0.0, 0.0);
+    let origin = Point::new(0.0, 0.0, 10.0);
+    let sphere = Sphere::new(origin, 2.0);
 
     let light_direction = Vector::unit(1.0, 1.0, -1.0).unwrap();
 
