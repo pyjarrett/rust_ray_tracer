@@ -93,7 +93,7 @@ impl Solid for Sphere {
 mod test {
     use super::Sphere;
     use math::{Point, Ray, Solid, Vector};
-    use math::util::assert_eq_eps;
+    use precision::*;
 
     #[test]
     pub fn test_intersection() {

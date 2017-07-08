@@ -1,4 +1,5 @@
 //! Mathematics module.
+#![allow(dead_code)]
 mod aabb;
 mod axis;
 mod intersection;
@@ -6,7 +7,6 @@ mod matrix;
 mod point;
 mod ray;
 mod sphere;
-mod util;
 mod vector;
 pub use self::aabb::AABB;
 pub use self::axis::Axis;

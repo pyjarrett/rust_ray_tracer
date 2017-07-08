@@ -57,9 +57,8 @@ impl AABB {
 #[cfg(test)]
 mod test {
     use super::AABB;
-    // use math::util::assert_eq_eps;
-    use math::util::assert_approx_eq;
     use math::{Point, Ray, Vector};
+    use precision::assert_approx_eq;
 
     #[test]
     fn test_misses_box() {

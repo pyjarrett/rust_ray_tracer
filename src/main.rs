@@ -1,25 +1,17 @@
 extern crate image;
 use std::fs::File;
-use std::f32;
 use std::path::Path;
 
 mod math;
-use math::{Intersection, Point, Solid, Sphere, Vector};
+use math::{Point, Solid, Sphere, Vector};
+
+mod precision;
 
 mod scene;
 use scene::{AngleUnit, Camera, Film, Perspective, Rectangle};
 
-/// Converts a float value in range [-1, 1] to [0, 255].
-fn float_to_hue(f: f32) -> u8 {
-    assert!(f >= -1.0);
-    assert!(f <= 1.0);
-    (((f + 1.0) / 2.0) * 255.0) as u8
-}
-
-/// Converts a normal to an array to assign as a color.
-fn unit_vector_as_color(v: Vector) -> [u8; 3] {
-    [float_to_hue(v.x), float_to_hue(v.y), float_to_hue(v.z)]
-}
+mod color;
+use color::unit_vector_as_color;
 
 fn main() {
     let film = Film::new(400, 300);

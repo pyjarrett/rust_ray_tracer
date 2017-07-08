@@ -1,7 +1,11 @@
+#![allow(dead_code)]
 use std::f32::consts::PI;
 use std::convert::From;
 use math::{Matrix4x4, Point, Ray};
 
+/// # Todo 
+/// - This should be renamed to something like "Dimension2D" or something.
+/// - This might also be better used in a different crate.
 pub trait Rectangle<T>
     where f64: From<T>
 {

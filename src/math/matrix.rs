@@ -230,7 +230,7 @@ impl Mul<Point> for Matrix4x4 {
 mod test {
     use super::Matrix4x4;
     use math::Point;
-    use math::util::assert_approx_eq;
+    use precision::assert_approx_eq;
 
     #[test]
     pub fn test_identity() {

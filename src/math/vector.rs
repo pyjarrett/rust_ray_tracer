@@ -128,8 +128,7 @@ impl fmt::Display for Vector {
 #[cfg(test)]
 mod test {
     use super::Vector;
-    use math::util::assert_approx_eq;
-    use math::util::assert_eq_eps;
+    use precision::{assert_approx_eq, assert_eq_eps};
 
     #[test]
     fn test_vector_length() {

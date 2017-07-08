@@ -1,4 +1,4 @@
-mod math;
-mod scene;
-pub use math::*;
-pub use scene::*;
+pub mod color;
+pub mod math;
+pub mod precision;
+pub mod scene;

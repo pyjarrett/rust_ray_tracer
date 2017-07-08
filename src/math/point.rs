@@ -85,7 +85,7 @@ impl fmt::Display for Point {
 #[cfg(test)]
 mod test {
     use super::Point;
-    use math::util::assert_approx_eq;
+    use precision::assert_approx_eq;
 
     #[test]
     fn test_equality() {
