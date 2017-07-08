@@ -128,23 +128,22 @@ impl fmt::Display for Vector {
 #[cfg(test)]
 mod test {
     use super::Vector;
-    use precision::{assert_approx_eq, assert_eq_eps};
 
     #[test]
     fn test_vector_length() {
-        assert_approx_eq(Vector::new(0.0, 0.0, 0.0).length(), 0.0);
-        assert_approx_eq(Vector::new(1.0, 0.0, 0.0).length(), 1.0);
-        assert_approx_eq(Vector::new(4.0, 0.0, 0.0).length(), 4.0);
-        assert_approx_eq(Vector::new(0.0, 3.0, 4.0).length(), 5.0);
-        assert_approx_eq(Vector::new(0.0, -3.0, -4.0).length(), 5.0);
+        assert_relative_eq!(Vector::new(0.0, 0.0, 0.0).length(), 0.0);
+        assert_relative_eq!(Vector::new(1.0, 0.0, 0.0).length(), 1.0);
+        assert_relative_eq!(Vector::new(4.0, 0.0, 0.0).length(), 4.0);
+        assert_relative_eq!(Vector::new(0.0, 3.0, 4.0).length(), 5.0);
+        assert_relative_eq!(Vector::new(0.0, -3.0, -4.0).length(), 5.0);
     }
 
     #[test]
     fn test_vector_normalization() {
         let mut v1 = Vector::new(3.0, 4.0, 5.0);
         let new_length = v1.normalize().unwrap();
-        assert_approx_eq(new_length, 1.0);
-        assert_approx_eq(new_length, v1.length());
+        assert_relative_eq!(new_length, 1.0);
+        assert_relative_eq!(new_length, v1.length());
 
         let mut zero_vector = Vector::new(0.0, 0.0, 0.0);
         assert!(zero_vector.normalize().is_err());
@@ -162,29 +161,29 @@ mod test {
         let y = Vector::new(0.0, 1.0, 0.0);
         let z = Vector::new(0.0, 0.0, 1.0);
 
-        assert_eq_eps(x.angle_with_in_degrees(x), 0.0, 0.001);
-        assert_eq_eps(x.angle_with_in_degrees(-x), 180.0, 0.001);
-        assert_eq_eps((-x).angle_with_in_degrees(x), 180.0, 0.001);
+        assert_relative_eq!(x.angle_with_in_degrees(x), 0.0, max_relative = 0.001);
+        assert_relative_eq!(x.angle_with_in_degrees(-x), 180.0, max_relative = 0.001);
+        assert_relative_eq!((-x).angle_with_in_degrees(x), 180.0, max_relative = 0.001);
 
-        assert_eq_eps(y.angle_with_in_degrees(y), 0.0, 0.001);
-        assert_eq_eps(y.angle_with_in_degrees(-y), 180.0, 0.001);
-        assert_eq_eps((-y).angle_with_in_degrees(y), 180.0, 0.001);
+        assert_relative_eq!(y.angle_with_in_degrees(y), 0.0, max_relative = 0.001);
+        assert_relative_eq!(y.angle_with_in_degrees(-y), 180.0, max_relative = 0.001);
+        assert_relative_eq!((-y).angle_with_in_degrees(y), 180.0, max_relative = 0.001);
 
-        assert_eq_eps(z.angle_with_in_degrees(z), 0.0, 0.001);
-        assert_eq_eps(z.angle_with_in_degrees(-z), 180.0, 0.001);
-        assert_eq_eps((-z).angle_with_in_degrees(z), 180.0, 0.001);
+        assert_relative_eq!(z.angle_with_in_degrees(z), 0.0, max_relative = 0.001);
+        assert_relative_eq!(z.angle_with_in_degrees(-z), 180.0, max_relative = 0.001);
+        assert_relative_eq!((-z).angle_with_in_degrees(z), 180.0, max_relative = 0.001);
 
-        assert_eq_eps(x.angle_with_in_degrees(y), 90.0, 0.001);
-        assert_eq_eps(x.angle_with_in_degrees(-y), 90.0, 0.001);
+        assert_relative_eq!(x.angle_with_in_degrees(y), 90.0, max_relative = 0.001);
+        assert_relative_eq!(x.angle_with_in_degrees(-y), 90.0, max_relative = 0.001);
 
-        assert_eq_eps(y.angle_with_in_degrees(x), 90.0, 0.001);
-        assert_eq_eps(y.angle_with_in_degrees(-x), 90.0, 0.001);
+        assert_relative_eq!(y.angle_with_in_degrees(x), 90.0, max_relative = 0.001);
+        assert_relative_eq!(y.angle_with_in_degrees(-x), 90.0, max_relative = 0.001);
 
-        assert_eq_eps(z.angle_with_in_degrees(y), 90.0, 0.001);
-        assert_eq_eps(z.angle_with_in_degrees(-y), 90.0, 0.001);
+        assert_relative_eq!(z.angle_with_in_degrees(y), 90.0, max_relative = 0.001);
+        assert_relative_eq!(z.angle_with_in_degrees(-y), 90.0, max_relative = 0.001);
 
-        assert_eq_eps(z.angle_with_in_degrees(x), 90.0, 0.001);
-        assert_eq_eps(z.angle_with_in_degrees(-x), 90.0, 0.001);
+        assert_relative_eq!(z.angle_with_in_degrees(x), 90.0, max_relative = 0.001);
+        assert_relative_eq!(z.angle_with_in_degrees(-x), 90.0, max_relative = 0.001);
     }
 
     #[test]
@@ -192,9 +191,9 @@ mod test {
         let v1 = Vector::new(1.0, 2.0, 3.0);
         let v2 = Vector::new(4.0, 5.0, 6.0);
         let v3 = v1 + v2;
-        assert_approx_eq(v3.x, 5.0);
-        assert_approx_eq(v3.y, 7.0);
-        assert_approx_eq(v3.z, 9.0);
+        assert_relative_eq!(v3.x, 5.0);
+        assert_relative_eq!(v3.y, 7.0);
+        assert_relative_eq!(v3.z, 9.0);
     }
 
     #[test]
@@ -202,38 +201,38 @@ mod test {
         let v1 = Vector::new(4.0, 5.0, 6.0);
         let v2 = Vector::new(3.0, 2.0, 1.0);
         let v3 = v1 - v2;
-        assert_approx_eq(v3.x, 1.0);
-        assert_approx_eq(v3.y, 3.0);
-        assert_approx_eq(v3.z, 5.0);
+        assert_relative_eq!(v3.x, 1.0);
+        assert_relative_eq!(v3.y, 3.0);
+        assert_relative_eq!(v3.z, 5.0);
     }
 
     #[test]
     fn test_vector_mul() {
         let v1 = Vector::new(1.0, 2.0, 3.0);
         let v2 = 7.0 * v1;
-        assert_approx_eq(v2.x, 7.0);
-        assert_approx_eq(v2.y, 14.0);
-        assert_approx_eq(v2.z, 21.0);
+        assert_relative_eq!(v2.x, 7.0);
+        assert_relative_eq!(v2.y, 14.0);
+        assert_relative_eq!(v2.z, 21.0);
     }
 
     #[test]
     fn test_vector_div() {
         let v1 = Vector::new(10.0, 12.0, 0.0);
         let v2 = v1 / 2.0;
-        assert_approx_eq(v2.x, 5.0);
-        assert_approx_eq(v2.y, 6.0);
-        assert_approx_eq(v2.z, 0.0);
+        assert_relative_eq!(v2.x, 5.0);
+        assert_relative_eq!(v2.y, 6.0);
+        assert_relative_eq!(v2.z, 0.0);
     }
 
     #[test]
     fn test_vector_neg() {
         let v1 = Vector::new(1.0, -2.0, 0.0);
         let v2 = -v1;
-        assert_approx_eq(v1.x, 1.0);
-        assert_approx_eq(v1.y, -2.0);
-        assert_approx_eq(v1.z, 0.0);
-        assert_approx_eq(v2.x, -1.0);
-        assert_approx_eq(v2.y, 2.0);
-        assert_approx_eq(v2.z, 0.0);
+        assert_relative_eq!(v1.x, 1.0);
+        assert_relative_eq!(v1.y, -2.0);
+        assert_relative_eq!(v1.z, 0.0);
+        assert_relative_eq!(v2.x, -1.0);
+        assert_relative_eq!(v2.y, 2.0);
+        assert_relative_eq!(v2.z, 0.0);
     }
 }

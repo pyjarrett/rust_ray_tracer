@@ -230,7 +230,6 @@ impl Mul<Point> for Matrix4x4 {
 mod test {
     use super::Matrix4x4;
     use math::Point;
-    use precision::assert_approx_eq;
 
     #[test]
     pub fn test_identity() {
@@ -238,9 +237,9 @@ mod test {
         let m = Matrix4x4::identity();
         let m_inv = m.inverse().unwrap();
         let same_point = m * p;
-        assert_approx_eq(same_point.x, p.x);
-        assert_approx_eq(same_point.y, p.y);
-        assert_approx_eq(same_point.z, p.z);
+        assert_relative_eq!(same_point.x, p.x);
+        assert_relative_eq!(same_point.y, p.y);
+        assert_relative_eq!(same_point.z, p.z);
         assert!(m_inv == m);
         assert!(m_inv * m == m * m_inv);
     }
@@ -250,9 +249,9 @@ mod test {
         let p = Point::new(1.0, 2.0, 3.0);
         let m = Matrix4x4::translate(7.0, 8.0, 9.0);
         let translated = m * p;
-        assert_approx_eq(translated.x, 8.0);
-        assert_approx_eq(translated.y, 10.0);
-        assert_approx_eq(translated.z, 12.0);
+        assert_relative_eq!(translated.x, 8.0);
+        assert_relative_eq!(translated.y, 10.0);
+        assert_relative_eq!(translated.z, 12.0);
     }
 
     #[test]
@@ -261,9 +260,9 @@ mod test {
         let m = Matrix4x4::translate(7.0, 8.0, 9.0);
         let m_inv = m.inverse().unwrap();
         let translated = m_inv * m * p;
-        assert_approx_eq(translated.x, p.x);
-        assert_approx_eq(translated.y, p.y);
-        assert_approx_eq(translated.z, p.z);
+        assert_relative_eq!(translated.x, p.x);
+        assert_relative_eq!(translated.y, p.y);
+        assert_relative_eq!(translated.z, p.z);
     }
 
     #[test]
@@ -271,9 +270,9 @@ mod test {
         let p = Point::new(1.0, 2.0, 3.0);
         let m = Matrix4x4::scale(2.5, 4.0, 8.0);
         let scaled = m * p;
-        assert_approx_eq(scaled.x, 2.5);
-        assert_approx_eq(scaled.y, 8.0);
-        assert_approx_eq(scaled.z, 24.0);
+        assert_relative_eq!(scaled.x, 2.5);
+        assert_relative_eq!(scaled.y, 8.0);
+        assert_relative_eq!(scaled.z, 24.0);
     }
 
     #[test]

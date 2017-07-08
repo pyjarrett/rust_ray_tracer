@@ -6,6 +6,7 @@ doc = false
 
 [dependencies]
 image = "0.10.3"
+approx = "0.1.1"
 
 [lib]
 name = "rrt"

@@ -93,7 +93,6 @@ impl Solid for Sphere {
 mod test {
     use super::Sphere;
     use math::{Point, Ray, Solid, Vector};
-    use precision::*;
 
     #[test]
     pub fn test_intersection() {
@@ -115,26 +114,26 @@ mod test {
         let expected_normal = Vector::new(-0.395, -0.123, -0.91);
 
         let t_intersection = s.intersection_time(r).unwrap();
-        assert_eq_eps(expected_t, t_intersection, 0.01);
-        assert_eq_eps(expected_t, intersection.time, 0.01);
+        assert_relative_eq!(expected_t, t_intersection, max_relative = 0.01);
+        assert_relative_eq!(expected_t, intersection.time, max_relative = 0.01);
 
         // Use expected_t here to reduce impact of carried error.
-        assert_eq_eps(expected_intersection_point.x, r.at(expected_t).x, 0.01);
-        assert_eq_eps(expected_intersection_point.y, r.at(expected_t).y, 0.01);
-        assert_eq_eps(expected_intersection_point.z, r.at(expected_t).z, 0.01);
-        assert_eq_eps(expected_intersection_point.x, intersection.point.x, 0.01);
-        assert_eq_eps(expected_intersection_point.y, intersection.point.y, 0.01);
-        assert_eq_eps(expected_intersection_point.z, intersection.point.z, 0.01);
+        assert_relative_eq!(expected_intersection_point.x, r.at(expected_t).x, max_relative = 0.01);
+        assert_relative_eq!(expected_intersection_point.y, r.at(expected_t).y, max_relative = 0.01);
+        assert_relative_eq!(expected_intersection_point.z, r.at(expected_t).z, max_relative = 0.01);
+        assert_relative_eq!(expected_intersection_point.x, intersection.point.x, max_relative = 0.01);
+        assert_relative_eq!(expected_intersection_point.y, intersection.point.y, max_relative = 0.01);
+        assert_relative_eq!(expected_intersection_point.z, intersection.point.z, max_relative = 0.01);
 
         // assert!(expected_intersection_point == r.at(expected_t));
         let intersection_normal = s.intersection_normal(r).unwrap();
-        assert_eq_eps(expected_normal.x, intersection_normal.x, 0.01);
-        assert_eq_eps(expected_normal.y, intersection_normal.y, 0.01);
-        assert_eq_eps(expected_normal.z, intersection_normal.z, 0.01);
+        assert_relative_eq!(expected_normal.x, intersection_normal.x, max_relative = 0.01);
+        assert_relative_eq!(expected_normal.y, intersection_normal.y, max_relative = 0.01);
+        assert_relative_eq!(expected_normal.z, intersection_normal.z, max_relative = 0.01);
 
         assert!(intersection.normal.is_normalized());
-        assert_eq_eps(expected_normal.x, intersection.normal.x, 0.01);
-        assert_eq_eps(expected_normal.y, intersection.normal.y, 0.01);
-        assert_eq_eps(expected_normal.z, intersection.normal.z, 0.01);
+        assert_relative_eq!(expected_normal.x, intersection.normal.x, max_relative = 0.01);
+        assert_relative_eq!(expected_normal.y, intersection.normal.y, max_relative = 0.01);
+        assert_relative_eq!(expected_normal.z, intersection.normal.z, max_relative = 0.01);
     }
 }

@@ -67,8 +67,9 @@ impl Index<Axis> for Point {
 
 impl PartialEq for Point {
     fn eq(&self, other: &Point) -> bool {
-        ((other.x - self.x).abs() <= 1e-6 && (other.y - self.y).abs() <= 1e-6 &&
-         (other.z - self.z).abs() <= 1e-6)
+        (relative_eq!(other.x, self.x) &&
+        relative_eq!(other.y, self.y) &&
+        relative_eq!(other.z, self.z))
     }
 }
 
@@ -85,7 +86,6 @@ impl fmt::Display for Point {
 #[cfg(test)]
 mod test {
     use super::Point;
-    use precision::assert_approx_eq;
 
     #[test]
     fn test_equality() {
@@ -103,7 +103,7 @@ mod test {
     fn test_distance_to() {
         let p1 = Point::new(0.0, 0.0, 0.0);
         let p2 = Point::new(3.0, 4.0, 0.0);
-        assert_approx_eq(p1.distance_to(p2), 5.0);
-        assert_approx_eq(p2.distance_to(p1), 5.0);
+        assert_relative_eq!(p1.distance_to(p2), 5.0);
+        assert_relative_eq!(p2.distance_to(p1), 5.0);
     }
 }

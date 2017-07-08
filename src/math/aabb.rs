@@ -58,7 +58,6 @@ impl AABB {
 mod test {
     use super::AABB;
     use math::{Point, Ray, Vector};
-    use precision::assert_approx_eq;
 
     #[test]
     fn test_misses_box() {
@@ -86,6 +85,6 @@ mod test {
         };
         let intersection_time = bb.intersection_time(r);
         assert!(intersection_time.is_some());
-        assert_approx_eq(intersection_time.unwrap(), 49.0);
+        assert_relative_eq!(intersection_time.unwrap(), 49.0);
     }
 }

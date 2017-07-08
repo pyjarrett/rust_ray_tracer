@@ -1,3 +1,5 @@
+#[macro_use] extern crate approx;
+
 extern crate image;
 use std::fs::File;
 use std::path::Path;
@@ -5,13 +7,8 @@ use std::path::Path;
 mod math;
 use math::{Point, Solid, Sphere, Vector};
 
-mod precision;
-
 mod scene;
 use scene::{AngleUnit, Camera, Film, Perspective, Rectangle};
-
-mod color;
-use color::unit_vector_as_color;
 
 fn main() {
     let film = Film::new(400, 300);
