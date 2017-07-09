@@ -11,7 +11,7 @@ mod scene;
 use scene::{AngleUnit, Camera, Film, Perspective, Rectangle};
 
 extern crate clap;
-use clap::{Arg, App, SubCommand};
+use clap::{App, SubCommand};
 
 fn render_sphere() {
     let film = Film::new(400, 300);
@@ -59,7 +59,7 @@ fn main() {
         .about("Render simple sphere"))
                     .get_matches();
 
-    if let Some(cmd_basic_sphere) = matches.subcommand_matches("basic_sphere") {
+    if let Some(_) = matches.subcommand_matches("basic_sphere") {
         render_sphere();
     }
 }
