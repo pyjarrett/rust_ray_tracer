@@ -10,7 +10,10 @@ use math::{Point, Solid, Sphere, Vector};
 mod scene;
 use scene::{AngleUnit, Camera, Film, Perspective, Rectangle};
 
-fn main() {
+extern crate clap;
+use clap::{Arg, App, SubCommand};
+
+fn render_sphere() {
     let film = Film::new(400, 300);
     let projection = Perspective::new(1.0, 1000.0, (45.0, AngleUnit::Degrees));
 
@@ -45,4 +48,18 @@ fn main() {
 
     let ref mut fout = File::create(&Path::new("sphere.png")).unwrap();
     let _ = image::ImageRgb8(image).save(fout, image::PNG);
+}
+
+
+fn main() {
+    let matches = App::new("Rust Ray Tracer")
+        .version("1.0")
+        .about("Basic ray tracing renderer, written in Rust.")
+        .subcommand(SubCommand::with_name("basic_sphere")
+        .about("Render simple sphere"))
+                    .get_matches();
+
+    if let Some(cmd_basic_sphere) = matches.subcommand_matches("basic_sphere") {
+        render_sphere();
+    }
 }

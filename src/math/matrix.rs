@@ -227,7 +227,7 @@ impl Mul<Point> for Matrix4x4 {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::Matrix4x4;
     use math::Point;
 
