@@ -14,19 +14,22 @@ extern crate clap;
 use clap::{App, SubCommand};
 
 fn render_sphere() {
+    // Set up the camera, film and the recording source.
     let film = Film::new(400, 300);
     let projection = Perspective::new(1.0, 1000.0, (45.0, AngleUnit::Degrees));
-
     let mut image = image::ImageBuffer::new(film.width() as u32, film.height() as u32);
     let camera = Camera::new(&film, &projection);
 
+    // Build the scene.
     let origin = Point::new(0.0, 0.0, 10.0);
     let sphere = Sphere::new(origin, 2.0);
-
     let light_direction = Vector::unit(1.0, 1.0, -1.0).unwrap();
 
+    // Generates samples for all film points.
     for (x, y, pixel) in image.enumerate_pixels_mut() {
         let ray = camera.generate_ray(x, y);
+
+        // Test for collision against the scene.
         if let Some(intersection) = sphere.intersect(&ray) {
             let normal = intersection.normal;
             assert!(normal.is_normalized());
@@ -46,7 +49,9 @@ fn render_sphere() {
         }
     }
 
-    let ref mut fout = File::create(&Path::new("sphere.png")).unwrap();
+    // Write the scene.
+    let scene_name = "sphere.png"
+    let ref mut fout = File::create(&Path::new(scene_name)).unwrap();
     let _ = image::ImageRgb8(image).save(fout, image::PNG);
 }
 
