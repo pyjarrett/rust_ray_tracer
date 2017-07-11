@@ -6,7 +6,7 @@ const MIN_LENGTH_FOR_NORMALIZATION: f32 = 1e-6;
 const NORMALIZED_EPS: f32 = 1e-6;
 
 /// 3D type for vectors and points.
-#[derive(Clone,Copy)]
+#[derive(Clone, Copy)]
 pub struct Vector {
     pub x: f32,
     pub y: f32,
@@ -29,7 +29,7 @@ impl Vector {
     }
 
     pub fn length(&self) -> f32 {
-        self.dot(*self).sqrt()
+        self.dot(self).sqrt()
     }
 
     /// Possibly normalizes the vector.
@@ -49,7 +49,7 @@ impl Vector {
         (self.length() - 1.0).abs() < NORMALIZED_EPS
     }
 
-    pub fn dot(&self, v: Vector) -> f32 {
+    pub fn dot(&self, v: &Vector) -> f32 {
         self.x * v.x + self.y * v.y + self.z * v.z
     }
 
@@ -59,7 +59,7 @@ impl Vector {
         let mut b = v.clone();
         a.normalize().unwrap();
         b.normalize().unwrap();
-        a.dot(b).acos().to_degrees()
+        a.dot(&b).acos().to_degrees()
     }
 }
 

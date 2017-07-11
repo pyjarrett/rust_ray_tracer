@@ -3,11 +3,12 @@ use std::f32::consts::PI;
 use std::convert::From;
 use math::{Matrix4x4, Point, Ray};
 
-/// # Todo 
+/// # Todo
 /// - This should be renamed to something like "Dimension2D" or something.
 /// - This might also be better used in a different crate.
 pub trait Rectangle<T>
-    where f64: From<T>
+where
+    f64: From<T>,
 {
     fn width(&self) -> T;
     fn height(&self) -> T;
@@ -27,8 +28,9 @@ struct BasicRectangle<T> {
 
 
 impl<T> BasicRectangle<T>
-    where f64: From<T>,
-          T: Copy
+where
+    f64: From<T>,
+    T: Copy,
 {
     pub fn new(width: T, height: T) -> BasicRectangle<T> {
         BasicRectangle {
@@ -39,8 +41,9 @@ impl<T> BasicRectangle<T>
 }
 
 impl<T> Rectangle<T> for BasicRectangle<T>
-    where f64: From<T>,
-          T: Copy
+where
+    f64: From<T>,
+    T: Copy,
 {
     fn width(&self) -> T {
         self.width
@@ -63,8 +66,7 @@ impl Film {
     pub fn new(width: u16, height: u16) -> Film {
         let size = BasicRectangle::<u16>::new(width, height);
         let screen = Film::screen_space_from_aspect_ratio(size.aspect_ratio());
-        let screen_to_raster =
-            Matrix4x4::scale(size.width() as f32, size.height() as f32, 1.0) *
+        let screen_to_raster = Matrix4x4::scale(size.width() as f32, size.height() as f32, 1.0) *
             Matrix4x4::scale(1.0 / screen.width(), 1.0 / screen.height(), 1.0) *
             Matrix4x4::translate(screen.width() / 2.0, screen.height() / 2.0, 0.0);
 

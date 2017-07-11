@@ -4,7 +4,7 @@ use std::ops::Mul;
 use math::Point;
 
 /// A row-major, 4x4 Matrix for use with homogeneous coordinates.
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Matrix4x4 {
     m: [[f32; 4]; 4],
 }
@@ -12,33 +12,47 @@ pub struct Matrix4x4 {
 impl Matrix4x4 {
     pub fn identity() -> Matrix4x4 {
         Matrix4x4 {
-            m: [[1.0, 0.0, 0.0, 0.0],
+            m: [
+                [1.0, 0.0, 0.0, 0.0],
                 [0.0, 1.0, 0.0, 0.0],
                 [0.0, 0.0, 1.0, 0.0],
-                [0.0, 0.0, 0.0, 1.0]],
+                [0.0, 0.0, 0.0, 1.0],
+            ],
         }
     }
 
     pub fn translate(x: f32, y: f32, z: f32) -> Matrix4x4 {
         Matrix4x4 {
-            m: [[1.0, 0.0, 0.0, x], [0.0, 1.0, 0.0, y], [0.0, 0.0, 1.0, z], [0.0, 0.0, 0.0, 1.0]],
+            m: [
+                [1.0, 0.0, 0.0, x],
+                [0.0, 1.0, 0.0, y],
+                [0.0, 0.0, 1.0, z],
+                [0.0, 0.0, 0.0, 1.0],
+            ],
         }
     }
 
     /// Generates a possibly non-uniform scale.
     pub fn scale(x: f32, y: f32, z: f32) -> Matrix4x4 {
         Matrix4x4 {
-            m: [[x, 0.0, 0.0, 0.0], [0.0, y, 0.0, 0.0], [0.0, 0.0, z, 0.0], [0.0, 0.0, 0.0, 1.0]],
+            m: [
+                [x, 0.0, 0.0, 0.0],
+                [0.0, y, 0.0, 0.0],
+                [0.0, 0.0, z, 0.0],
+                [0.0, 0.0, 0.0, 1.0],
+            ],
         }
     }
 
     pub fn perspective(near: f32, far: f32, fov_radians: f32) -> Matrix4x4 {
         let inv_tan_half_fov = 1.0 / ((fov_radians / 2.0).tan());
         Matrix4x4 {
-            m: [[inv_tan_half_fov, 0.0, 0.0, 0.0],
+            m: [
+                [inv_tan_half_fov, 0.0, 0.0, 0.0],
                 [0.0, inv_tan_half_fov, 0.0, 0.0],
                 [0.0, 0.0, far / (far - near), -(far * near) / (far - near)],
-                [0.0, 0.0, 1.0, 0.0]],
+                [0.0, 0.0, 1.0, 0.0],
+            ],
         }
     }
 
@@ -128,12 +142,14 @@ impl fmt::Display for Matrix4x4 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut res = write!(f, "\n");
         for row in 0..4 {
-            res = write!(f,
-                         "{:>8.4} {:>8.4} {:>8.4} {:>8.4}\n",
-                         self.m[row][0],
-                         self.m[row][1],
-                         self.m[row][2],
-                         self.m[row][3]);
+            res = write!(
+                f,
+                "{:>8.4} {:>8.4} {:>8.4} {:>8.4}\n",
+                self.m[row][0],
+                self.m[row][1],
+                self.m[row][2],
+                self.m[row][3]
+            );
             if res.is_err() {
                 return res;
             }
@@ -169,44 +185,54 @@ impl<'a, 'b> Mul<&'a Matrix4x4> for &'b Matrix4x4 {
     type Output = Matrix4x4;
     fn mul(self, rhs: &Matrix4x4) -> Self::Output {
         Matrix4x4 {
-            m: [// first row.
-                [self.m[0][0] * rhs.m[0][0] + self.m[0][1] * rhs.m[1][0] +
-                 self.m[0][2] * rhs.m[2][0] + self.m[0][3] * rhs.m[3][0],
-                 self.m[0][0] * rhs.m[0][1] + self.m[0][1] * rhs.m[1][1] +
-                 self.m[0][2] * rhs.m[2][1] + self.m[0][3] * rhs.m[3][1],
-                 self.m[0][0] * rhs.m[0][2] + self.m[0][1] * rhs.m[1][2] +
-                 self.m[0][2] * rhs.m[2][2] + self.m[0][3] * rhs.m[3][2],
-                 self.m[0][0] * rhs.m[0][3] + self.m[0][1] * rhs.m[1][3] +
-                 self.m[0][2] * rhs.m[2][3] + self.m[0][3] * rhs.m[3][3]],
+            m: [
+                // first row.
+                [
+                    self.m[0][0] * rhs.m[0][0] + self.m[0][1] * rhs.m[1][0] +
+                        self.m[0][2] * rhs.m[2][0] + self.m[0][3] * rhs.m[3][0],
+                    self.m[0][0] * rhs.m[0][1] + self.m[0][1] * rhs.m[1][1] +
+                        self.m[0][2] * rhs.m[2][1] + self.m[0][3] * rhs.m[3][1],
+                    self.m[0][0] * rhs.m[0][2] + self.m[0][1] * rhs.m[1][2] +
+                        self.m[0][2] * rhs.m[2][2] + self.m[0][3] * rhs.m[3][2],
+                    self.m[0][0] * rhs.m[0][3] + self.m[0][1] * rhs.m[1][3] +
+                        self.m[0][2] * rhs.m[2][3] + self.m[0][3] * rhs.m[3][3],
+                ],
 
                 // second row
-                [self.m[1][0] * rhs.m[0][0] + self.m[1][1] * rhs.m[1][0] +
-                 self.m[1][2] * rhs.m[2][0] + self.m[1][3] * rhs.m[3][0],
-                 self.m[1][0] * rhs.m[0][1] + self.m[1][1] * rhs.m[1][1] +
-                 self.m[1][2] * rhs.m[2][1] + self.m[1][3] * rhs.m[3][1],
-                 self.m[1][0] * rhs.m[0][2] + self.m[1][1] * rhs.m[1][2] +
-                 self.m[1][2] * rhs.m[2][2] + self.m[1][3] * rhs.m[3][2],
-                 self.m[1][0] * rhs.m[0][3] + self.m[1][1] * rhs.m[1][3] +
-                 self.m[1][2] * rhs.m[2][3] + self.m[1][3] * rhs.m[3][3]],
+                [
+                    self.m[1][0] * rhs.m[0][0] + self.m[1][1] * rhs.m[1][0] +
+                        self.m[1][2] * rhs.m[2][0] + self.m[1][3] * rhs.m[3][0],
+                    self.m[1][0] * rhs.m[0][1] + self.m[1][1] * rhs.m[1][1] +
+                        self.m[1][2] * rhs.m[2][1] + self.m[1][3] * rhs.m[3][1],
+                    self.m[1][0] * rhs.m[0][2] + self.m[1][1] * rhs.m[1][2] +
+                        self.m[1][2] * rhs.m[2][2] + self.m[1][3] * rhs.m[3][2],
+                    self.m[1][0] * rhs.m[0][3] + self.m[1][1] * rhs.m[1][3] +
+                        self.m[1][2] * rhs.m[2][3] + self.m[1][3] * rhs.m[3][3],
+                ],
 
                 // etc...
-                [self.m[2][0] * rhs.m[0][0] + self.m[2][1] * rhs.m[1][0] +
-                 self.m[2][2] * rhs.m[2][0] + self.m[2][3] * rhs.m[3][0],
-                 self.m[2][0] * rhs.m[0][1] + self.m[2][1] * rhs.m[1][1] +
-                 self.m[2][2] * rhs.m[2][1] + self.m[2][3] * rhs.m[3][1],
-                 self.m[2][0] * rhs.m[0][2] + self.m[2][1] * rhs.m[1][2] +
-                 self.m[2][2] * rhs.m[2][2] + self.m[2][3] * rhs.m[3][2],
-                 self.m[2][0] * rhs.m[0][3] + self.m[2][1] * rhs.m[1][3] +
-                 self.m[2][2] * rhs.m[2][3] + self.m[2][3] * rhs.m[3][3]],
+                [
+                    self.m[2][0] * rhs.m[0][0] + self.m[2][1] * rhs.m[1][0] +
+                        self.m[2][2] * rhs.m[2][0] + self.m[2][3] * rhs.m[3][0],
+                    self.m[2][0] * rhs.m[0][1] + self.m[2][1] * rhs.m[1][1] +
+                        self.m[2][2] * rhs.m[2][1] + self.m[2][3] * rhs.m[3][1],
+                    self.m[2][0] * rhs.m[0][2] + self.m[2][1] * rhs.m[1][2] +
+                        self.m[2][2] * rhs.m[2][2] + self.m[2][3] * rhs.m[3][2],
+                    self.m[2][0] * rhs.m[0][3] + self.m[2][1] * rhs.m[1][3] +
+                        self.m[2][2] * rhs.m[2][3] + self.m[2][3] * rhs.m[3][3],
+                ],
 
-                [self.m[3][0] * rhs.m[0][0] + self.m[3][1] * rhs.m[1][0] +
-                 self.m[3][2] * rhs.m[2][0] + self.m[3][3] * rhs.m[3][0],
-                 self.m[3][0] * rhs.m[0][1] + self.m[3][1] * rhs.m[1][1] +
-                 self.m[3][2] * rhs.m[2][1] + self.m[3][3] * rhs.m[3][1],
-                 self.m[3][0] * rhs.m[0][2] + self.m[3][1] * rhs.m[1][2] +
-                 self.m[3][2] * rhs.m[2][2] + self.m[3][3] * rhs.m[3][2],
-                 self.m[3][0] * rhs.m[0][3] + self.m[3][1] * rhs.m[1][3] +
-                 self.m[3][2] * rhs.m[2][3] + self.m[3][3] * rhs.m[3][3]]],
+                [
+                    self.m[3][0] * rhs.m[0][0] + self.m[3][1] * rhs.m[1][0] +
+                        self.m[3][2] * rhs.m[2][0] + self.m[3][3] * rhs.m[3][0],
+                    self.m[3][0] * rhs.m[0][1] + self.m[3][1] * rhs.m[1][1] +
+                        self.m[3][2] * rhs.m[2][1] + self.m[3][3] * rhs.m[3][1],
+                    self.m[3][0] * rhs.m[0][2] + self.m[3][1] * rhs.m[1][2] +
+                        self.m[3][2] * rhs.m[2][2] + self.m[3][3] * rhs.m[3][2],
+                    self.m[3][0] * rhs.m[0][3] + self.m[3][1] * rhs.m[1][3] +
+                        self.m[3][2] * rhs.m[2][3] + self.m[3][3] * rhs.m[3][3],
+                ],
+            ],
         }
     }
 }
@@ -215,12 +241,11 @@ impl<'a, 'b> Mul<&'a Matrix4x4> for &'b Matrix4x4 {
 impl Mul<Point> for Matrix4x4 {
     type Output = Point;
     fn mul(self, p: Point) -> Self::Output {
-        let r = Point::new(self.m[0][0] * p.x + self.m[0][1] * p.y + self.m[0][2] * p.z +
-                           self.m[0][3] * 1.0,
-                           self.m[1][0] * p.x + self.m[1][1] * p.y + self.m[1][2] * p.z +
-                           self.m[1][3] * 1.0,
-                           self.m[2][0] * p.x + self.m[2][1] * p.y + self.m[2][2] * p.z +
-                           self.m[2][3] * 1.0);
+        let r = Point::new(
+            self.m[0][0] * p.x + self.m[0][1] * p.y + self.m[0][2] * p.z + self.m[0][3] * 1.0,
+            self.m[1][0] * p.x + self.m[1][1] * p.y + self.m[1][2] * p.z + self.m[1][3] * 1.0,
+            self.m[2][0] * p.x + self.m[2][1] * p.y + self.m[2][2] * p.z + self.m[2][3] * 1.0,
+        );
         let w = self.m[3][0] * p.x + self.m[3][1] * p.y + self.m[3][2] * p.z + self.m[3][3];
         1.0 / w * r
     }

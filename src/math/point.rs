@@ -3,7 +3,7 @@ use std::fmt;
 use std::ops::{Add, Sub, Mul, Index};
 use math::{Axis, Vector};
 
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Point {
     pub x: f32,
     pub y: f32,
@@ -67,9 +67,8 @@ impl Index<Axis> for Point {
 
 impl PartialEq for Point {
     fn eq(&self, other: &Point) -> bool {
-        (relative_eq!(other.x, self.x) &&
-        relative_eq!(other.y, self.y) &&
-        relative_eq!(other.z, self.z))
+        (relative_eq!(other.x, self.x) && relative_eq!(other.y, self.y) &&
+             relative_eq!(other.z, self.z))
     }
 }
 
