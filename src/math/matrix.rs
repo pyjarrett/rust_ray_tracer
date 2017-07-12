@@ -3,10 +3,17 @@ use std::cmp::Eq;
 use std::ops::Mul;
 use math::{Point, Ray, Vector};
 
-/// A row-major, 4x4 Matrix for use with homogeneous coordinates.
+/// A row-major, 4x4 Matrix for use with homogeneous coordinate transforms.
 ///
 /// # Remarks
-/// Using a row-major allows convenient indexing of the matrix using `m[row][col]`.
+/// Using a row-major ordering of matrix elements allows convenient indexing of the matrix using
+/// `m[row][col]`.  However, matrix element memory ordering is independent of the notation to
+/// specify multiplications.  Note that the convention maintained is to treat vectors and points as
+/// columns, not rows so we use the convention `M * v` rather than `v * M`.
+///
+/// The columns of this matrix show how the three basis vectors and the origin point for the
+/// current coordinate system will be transformed.
+///
 #[derive(Copy, Clone)]
 pub struct Matrix4x4 {
     m: [[f32; 4]; 4],
@@ -240,8 +247,6 @@ impl<'a, 'b> Mul<&'a Matrix4x4> for &'b Matrix4x4 {
     }
 }
 
-// TODO: Perform the w divide.
-// TODO: Ensure that this matches the row-major matrix conventions.
 impl Mul<Point> for Matrix4x4 {
     type Output = Point;
     fn mul(self, p: Point) -> Self::Output {
@@ -255,8 +260,6 @@ impl Mul<Point> for Matrix4x4 {
     }
 }
 
-// TODO: Perform the w divide.
-// TODO: Ensure that this matches the row-major matrix conventions.
 impl Mul<Vector> for Matrix4x4 {
     type Output = Vector;
     fn mul(self, p: Vector) -> Self::Output {

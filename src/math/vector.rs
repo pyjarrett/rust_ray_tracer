@@ -2,10 +2,11 @@ use std::ops::{Add, AddAssign, Sub, Mul, Div, Neg, Index};
 use std::fmt;
 use math::Axis;
 
+// TODO: Move these into an approximation library.
 const MIN_LENGTH_FOR_NORMALIZATION: f32 = 1e-6;
 const NORMALIZED_EPS: f32 = 1e-6;
 
-/// 3D type for vectors and points.
+/// A 3 dimensional vector.
 #[derive(Clone, Copy)]
 pub struct Vector {
     pub x: f32,
