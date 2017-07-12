@@ -1,9 +1,12 @@
 use std::fmt;
 use std::cmp::Eq;
 use std::ops::Mul;
-use math::Point;
+use math::{Point, Ray, Vector};
 
 /// A row-major, 4x4 Matrix for use with homogeneous coordinates.
+///
+/// # Remarks
+/// Using a row-major allows convenient indexing of the matrix using `m[row][col]`.
 #[derive(Copy, Clone)]
 pub struct Matrix4x4 {
     m: [[f32; 4]; 4],
@@ -238,6 +241,7 @@ impl<'a, 'b> Mul<&'a Matrix4x4> for &'b Matrix4x4 {
 }
 
 // TODO: Perform the w divide.
+// TODO: Ensure that this matches the row-major matrix conventions.
 impl Mul<Point> for Matrix4x4 {
     type Output = Point;
     fn mul(self, p: Point) -> Self::Output {
@@ -248,6 +252,29 @@ impl Mul<Point> for Matrix4x4 {
         );
         let w = self.m[3][0] * p.x + self.m[3][1] * p.y + self.m[3][2] * p.z + self.m[3][3];
         1.0 / w * r
+    }
+}
+
+// TODO: Perform the w divide.
+// TODO: Ensure that this matches the row-major matrix conventions.
+impl Mul<Vector> for Matrix4x4 {
+    type Output = Vector;
+    fn mul(self, p: Vector) -> Self::Output {
+        Vector::new(
+            self.m[0][0] * p.x + self.m[0][1] * p.y + self.m[0][2] * p.z,
+            self.m[1][0] * p.x + self.m[1][1] * p.y + self.m[1][2] * p.z,
+            self.m[2][0] * p.x + self.m[2][1] * p.y + self.m[2][2] * p.z,
+        )
+    }
+}
+
+impl Mul<Ray> for Matrix4x4 {
+    type Output = Ray;
+    fn mul(self, r: Ray) -> Self::Output {
+        Ray {
+            origin: self * r.origin,
+            direction: self * r.direction,
+        }
     }
 }
 

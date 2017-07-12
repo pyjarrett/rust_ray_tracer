@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, Mul, Div, Neg, Index};
+use std::ops::{Add, AddAssign, Sub, Mul, Div, Neg, Index};
 use std::fmt;
 use math::Axis;
 
@@ -71,6 +71,14 @@ impl Add for Vector {
     }
 }
 
+impl AddAssign for Vector {
+    fn add_assign(&mut self, rhs: Vector) {
+        self.x += rhs.x;
+        self.y += rhs.y;
+        self.z += rhs.z;
+    }
+}
+
 impl Sub for Vector {
     type Output = Vector;
     fn sub(self, rhs: Vector) -> Vector {
@@ -82,6 +90,13 @@ impl Mul<f32> for Vector {
     type Output = Vector;
     fn mul(self, rhs: f32) -> Vector {
         Vector::new(self.x * rhs, self.y * rhs, self.z * rhs)
+    }
+}
+
+impl Mul<Vector> for Vector {
+    type Output = Vector;
+    fn mul(self, rhs: Vector) -> Vector {
+        Vector::new(self.x * rhs.x, self.y * rhs.y, self.z * rhs.z)
     }
 }
 
