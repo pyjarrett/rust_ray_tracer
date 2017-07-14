@@ -3,10 +3,7 @@ use std::f32::consts::PI;
 use std::convert::From;
 use math::{Matrix4x4, Point, Ray};
 
-/// # Todo
-/// - This should be renamed to something like "Dimension2D" or something.
-/// - This might also be better used in a different crate.
-pub trait Rectangle<T>
+pub trait Dimensions2<T>
 where
     f64: From<T>,
 {
@@ -21,26 +18,26 @@ where
 
 #[derive(Clone, Copy)]
 /// An immutable rectangle.
-struct BasicRectangle<T> {
+struct BasicDimensions2<T> {
     width: T,
     height: T,
 }
 
 
-impl<T> BasicRectangle<T>
+impl<T> BasicDimensions2<T>
 where
     f64: From<T>,
     T: Copy,
 {
-    pub fn new(width: T, height: T) -> BasicRectangle<T> {
-        BasicRectangle {
+    pub fn new(width: T, height: T) -> BasicDimensions2<T> {
+        BasicDimensions2 {
             width: width,
             height: height,
         }
     }
 }
 
-impl<T> Rectangle<T> for BasicRectangle<T>
+impl<T> Dimensions2<T> for BasicDimensions2<T>
 where
     f64: From<T>,
     T: Copy,
@@ -57,14 +54,14 @@ where
 
 /// The mapping between the raster (film) and the image plane of the camera.
 pub struct Film {
-    size: BasicRectangle<u16>,
+    size: BasicDimensions2<u16>,
     raster_to_screen: Matrix4x4,
     screen_to_raster: Matrix4x4,
 }
 
 impl Film {
     pub fn new(width: u16, height: u16) -> Film {
-        let size = BasicRectangle::<u16>::new(width, height);
+        let size = BasicDimensions2::<u16>::new(width, height);
         let screen = Film::screen_space_from_aspect_ratio(size.aspect_ratio());
         let screen_to_raster = Matrix4x4::scale(size.width() as f32, size.height() as f32, 1.0) *
             Matrix4x4::scale(1.0 / screen.width(), 1.0 / screen.height(), 1.0) *
@@ -83,7 +80,7 @@ impl Film {
     /// # Arguments
     ///
     /// * `aspect_ratio` - the ratio of width to height.
-    fn screen_space_from_aspect_ratio(aspect_ratio: f32) -> BasicRectangle<f32> {
+    fn screen_space_from_aspect_ratio(aspect_ratio: f32) -> BasicDimensions2<f32> {
         assert!(aspect_ratio > 0.0);
         let w: f32;
         let h: f32;
@@ -96,7 +93,7 @@ impl Film {
             h = 2.0 * aspect_ratio;
         }
 
-        BasicRectangle::<f32>::new(w, h)
+        BasicDimensions2::<f32>::new(w, h)
     }
 
     pub fn raster_to_screen(&self) -> &Matrix4x4 {
@@ -108,7 +105,7 @@ impl Film {
     }
 }
 
-impl Rectangle<u16> for Film {
+impl Dimensions2<u16> for Film {
     fn width(&self) -> u16 {
         self.size.width()
     }
@@ -172,6 +169,7 @@ impl Projection for Perspective {
 
 /// A film and projection melded into a single functional component, providing raycasting from the
 /// viewing to the scene.
+///
 pub struct Camera {
     raster_to_camera: Matrix4x4,
     camera_to_raster: Matrix4x4,

@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 pub mod camera;
-pub use self::camera::{AngleUnit, Camera, Film, Rectangle, Perspective, Projection};
+pub use self::camera::{AngleUnit, Camera, Dimensions2, Film, Perspective, Projection};
 
 use std::f32::INFINITY;
 use math::{Intersection, Matrix4x4, Point, Ray, Solid, Vector};
@@ -12,6 +12,13 @@ type Spectrum = Vector;
 /// properties of the object.
 pub trait Material {
     /// Materials are perfectly reflective by default.
+    ///
+    /// # Arguments
+    /// * `incident` - vector pointing into the material whose next direction must be determined.
+    /// * `normal` - vector perpendicular to the surface
+    ///
+    /// # Return
+    /// Either a reflected or refracted vector pointing in the new direction.
     fn next_ray_direction(&self, incident: &Vector, normal: &Vector) -> Vector {
         2.0 * (normal.dot(incident) * (*normal))
     }
@@ -25,6 +32,19 @@ pub trait Material {
     fn f(&self, light: &Vector, view: &Vector) -> Spectrum;
 }
 
+pub trait NonAreaLight {
+    /// We use a simplified version of the BRDF in this case, so here use irradiance instead of
+    /// radiance.
+    ///
+    /// # Arguments
+    /// * `position` - point to illuminate with the light
+    /// * `normal` - the surface normal being illuminated.
+    ///
+    /// # Returns
+    /// * `Spectrum` - the irradiance measured at the surface
+    fn irradiance(&self, position: &Point, normal: &Vector) -> Spectrum;
+}
+
 /// Lambertian material consisting of a single diffuse color.
 pub struct LambertianMaterial {
     diffuse: Spectrum,
@@ -32,9 +52,7 @@ pub struct LambertianMaterial {
 
 impl LambertianMaterial {
     pub fn new(diffuse: &Spectrum) -> LambertianMaterial {
-        LambertianMaterial {
-            diffuse: *diffuse
-        }
+        LambertianMaterial { diffuse: *diffuse }
     }
 }
 
@@ -60,7 +78,7 @@ impl Solid for Entity {
 
         if let Some(intersection) = self.shape.intersect(&local_ray) {
             // Convert the intersection back into the world coordinate system.
-            return Some(self.transform.to_world * intersection)
+            return Some(self.transform.to_world * intersection);
         }
         None
     }
@@ -76,19 +94,6 @@ pub struct Transform {
     pub to_world: Matrix4x4,
 }
 
-pub trait NonAreaLight {
-    /// We use a simplified version of the BRDF in this case, so here use irradiance instead of
-    /// radiance.
-    ///
-    /// # Arguments
-    /// * `position` - point to illuminate with the light
-    /// * `normal` - the surface normal being illuminated.
-    ///
-    /// # Returns
-    /// * `Spectrum` - the irradiance measured at the surface
-    fn irradiance(&self, position: &Point, normal: &Vector) -> Spectrum;
-}
-
 pub struct DirectionalLight {
     direction: Vector,
     radiance: Spectrum,
@@ -98,7 +103,7 @@ impl DirectionalLight {
     pub fn new(direction: &Vector, radiance: &Spectrum) -> DirectionalLight {
         let mut d = *direction;
         d.normalize().expect(
-            "Provide a direction vector which cannot be normalized for a directional light."
+            "Provide a direction vector which cannot be normalized for a directional light.",
         );
         DirectionalLight {
             direction: d,
@@ -133,15 +138,21 @@ impl Scene {
     }
 
     /// TODO: Merge terminology of "shape" and "solid".
-    pub fn add_entity(&mut self, shape: Box<Solid>, material: Box<Material>, transform: Matrix4x4)
-    {
+    ///
+    /// # Arguments
+    /// * `shape` - the intersection bounds of the object to create
+    /// * `material` - material to apply to the object
+    /// * `transform` - converts world coordinates to local coordinates
+    pub fn add_entity(&mut self, shape: Box<Solid>, material: Box<Material>, transform: Matrix4x4) {
         self.entities.push(Box::new(Entity {
             shape: shape,
             material: material,
             transform: Transform {
                 to_local: transform,
-                to_world: transform.inverse().expect("Uninvertible trasnform used for an entity."),
-            }
+                to_world: transform.inverse().expect(
+                    "Uninvertible trasnform used for an entity.",
+                ),
+            },
         }));
     }
 
@@ -149,14 +160,14 @@ impl Scene {
     /// cast from.  This makes this used for backward ray casting.
     ///
     /// # Argument
-    /// * `ray` - a ray eminating from the camera from the viewer, along which the radiance
+    /// * `ray` - a ray emanating from the camera from the viewer, along which the radiance
     /// should be determined.
     ///
     /// # Return
     /// * `Spectrum` - the radiance along this ray in the opposite direction.
     pub fn trace(&self, ray: &Ray) -> Spectrum {
         // Find the closest entity being intersected.
-        let mut closest_object : Option<&Box<Entity>> = None;
+        let mut closest_object: Option<&Box<Entity>> = None;
         let mut closest_intersection: Option<Intersection> = None;
         let mut best_time: f32 = INFINITY;
 
@@ -172,6 +183,7 @@ impl Scene {
         }
 
         // If no entity was intersected, return black.
+        // This might be changed to account for other types of ambient light.
         match closest_object {
             None => Vector::new(0.0, 0.0, 0.),
             Some(obj) => self.radiance_from(ray, obj, &closest_intersection.unwrap()),
@@ -180,12 +192,19 @@ impl Scene {
 
     /// Determine the total amount of radiance coming from a specific
     /// object along a given ray.
-    fn radiance_from(&self, ray: &Ray, entity: &Box<Entity>, intersection: &Intersection) -> Spectrum {
+    fn radiance_from(
+        &self,
+        ray: &Ray,
+        entity: &Box<Entity>,
+        intersection: &Intersection,
+    ) -> Spectrum {
         // Sum the contributions from all lights.
         let mut radiance = Vector::new(0.0, 0.0, 0.0);
-
         for ref light in self.lights.iter() {
-            radiance += entity.material.f(&intersection.normal, &intersection.normal) * light.irradiance(&intersection.point, &intersection.normal)
+            radiance += entity.material.f(
+                &intersection.normal,
+                &intersection.normal,
+            ) * light.irradiance(&intersection.point, &intersection.normal)
         }
         radiance
     }
