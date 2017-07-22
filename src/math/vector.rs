@@ -142,7 +142,7 @@ impl fmt::Display for Vector {
 
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::Vector;
 
     #[test]

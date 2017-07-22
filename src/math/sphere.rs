@@ -90,7 +90,7 @@ impl Solid for Sphere {
 
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::Sphere;
     use math::{Point, Ray, Solid, Vector};
 

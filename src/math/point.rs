@@ -83,7 +83,7 @@ impl fmt::Display for Point {
 
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::Point;
 
     #[test]

@@ -29,7 +29,7 @@ impl fmt::Display for Ray {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     #[test]
     fn test_at() {}
 }

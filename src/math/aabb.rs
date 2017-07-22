@@ -55,7 +55,7 @@ impl AABB {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::AABB;
     use math::{Point, Ray, Vector};
 
