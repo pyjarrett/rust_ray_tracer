@@ -3,6 +3,8 @@ use std::f32::consts::PI;
 use std::convert::From;
 use math::{Matrix4x4, Point, Ray};
 
+/// A object with width and height.  Typically these are rectangular though no requirement exists
+/// for this.
 pub trait Dimensions2<T>
 where
     f64: From<T>,
@@ -60,9 +62,14 @@ pub struct Film {
 }
 
 impl Film {
+    /// Converting from screen to raster:
+    /// 1.) Offset the screen by half its dimensions so all X,Y coordinates become non-negative.
+    /// 2.) Squash the screen so X, Y range from [0, 1].
+    /// 3.) Scale to the raster range X in [0, raster_width], Y in [0, raster_height].
     pub fn new(width: u16, height: u16) -> Film {
         let size = BasicDimensions2::<u16>::new(width, height);
         let screen = Film::screen_space_from_aspect_ratio(size.aspect_ratio());
+
         let screen_to_raster = Matrix4x4::scale(size.width() as f32, size.height() as f32, 1.0) *
             Matrix4x4::scale(1.0 / screen.width(), 1.0 / screen.height(), 1.0) *
             Matrix4x4::translate(screen.width() / 2.0, screen.height() / 2.0, 0.0);
@@ -74,8 +81,7 @@ impl Film {
         }
     }
 
-    /// Screen space defined by the image plane of the viewing frustum
-    /// centered at (0, 0).
+    /// Gives the dimension of the image plane (screen space).
     ///
     /// # Arguments
     ///
@@ -115,10 +121,12 @@ impl Dimensions2<u16> for Film {
     }
 }
 
-/// Provides units for angles.
-pub enum AngleUnit {
-    Radians,
-    Degrees,
+/// Provides units for planar angles.
+///
+/// We often want to be explicit about the units we're dealing with, so this lets us be explicit.
+pub enum PlanarAngle<T = f32> {
+    Radians(T),
+    Degrees(T),
 }
 
 pub trait Projection {
@@ -139,13 +147,13 @@ impl Perspective {
     /// * `far` - distance to far plane
     /// * `fov` - field of view, and its units.
     ///
-    pub fn new(near: f32, far: f32, fov: (f32, AngleUnit)) -> Perspective {
+    pub fn new(near: f32, far: f32, fov: PlanarAngle) -> Perspective {
         assert!(near > 0.0);
         assert!(far > near);
 
         let fov_radians = match fov {
-            (value, AngleUnit::Degrees) => value.to_radians(),
-            (value, AngleUnit::Radians) => value,
+            PlanarAngle::Degrees(value) => value.to_radians(),
+            PlanarAngle::Radians(value) => value,
         };
         assert!(fov_radians > 0.0 && fov_radians < 2.0 * PI);
 
@@ -167,7 +175,7 @@ impl Projection for Perspective {
     }
 }
 
-/// A film and projection melded into a single functional component, providing raycasting from the
+/// A film and projection melded into a single functional component, providing ray casting from the
 /// viewing to the scene.
 ///
 pub struct Camera {
@@ -176,7 +184,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    // TODO: Add camera_to_world transform (be sure to normalize rays!)
+    // TODO: #9 Add camera_to_world transform (be sure to normalize rays!)
     pub fn new(film: &Film, projection: &Projection) -> Camera {
         let raster_to_camera = projection.screen_to_camera() * film.raster_to_screen();
         let camera_to_raster = raster_to_camera.inverse().unwrap();

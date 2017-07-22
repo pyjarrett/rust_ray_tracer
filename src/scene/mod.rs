@@ -1,6 +1,23 @@
 #![allow(dead_code)]
+/// # Coordinate spaces
+/// ## Screen space
+/// Screen space defined by the image plane of the viewing frustum
+/// centered at (0, 0).
+///
+/// On the more limiting dimension of width or height, screen space extends from -1 to 1.  The
+/// larger dimension will extend from `-aspect_ratio` to `+aspect_ratio`.
+///
+/// The near plane is a Z=0 and the far plane at Z=1.
+///
+/// ## Raster Space
+///
+/// The coordinates for pixels (sample positions) on the image.
+///
+/// X range is [0, width], and Y range is [0, height] with (0,0) in the lower left
+/// corner.
+
 pub mod camera;
-pub use self::camera::{AngleUnit, Camera, Dimensions2, Film, Perspective, Projection};
+pub use self::camera::{Camera, Dimensions2, Film, Perspective, PlanarAngle, Projection};
 
 use std::f32::INFINITY;
 use math::{Intersection, Matrix4x4, Point, Ray, Solid, Vector};
@@ -115,7 +132,7 @@ impl DirectionalLight {
 impl NonAreaLight for DirectionalLight {
     #[allow(unused_variables)]
     fn irradiance(&self, position: &Point, normal: &Vector) -> Spectrum {
-        (-self.direction.dot(&normal)).max(0.0) * self.radiance
+        (-self.direction).dot(&normal).max(0.0) * self.radiance
     }
 }
 
@@ -150,7 +167,7 @@ impl Scene {
             transform: Transform {
                 to_local: transform,
                 to_world: transform.inverse().expect(
-                    "Uninvertible trasnform used for an entity.",
+                    "Uninvertible transform used for an entity.",
                 ),
             },
         }));
@@ -174,7 +191,8 @@ impl Scene {
         for ref obj in self.entities.iter() {
             // TODO: Transform the ray into the local coordinate space of the object.
             if let Some(intersection) = obj.intersect(&ray) {
-                if intersection.time < best_time {
+                //println!("Intersection at {}", intersection.point);
+                if intersection.time < best_time && intersection.time > 0.0 {
                     best_time = intersection.time;
                     closest_intersection = Some(intersection);
                     closest_object = Some(*obj);
@@ -201,9 +219,16 @@ impl Scene {
         // Sum the contributions from all lights.
         let mut radiance = Vector::new(0.0, 0.0, 0.0);
         for ref light in self.lights.iter() {
+            // TODO: Add direction check to light.
+
+            // Determine if we can even see this light from the intersection point.
+
+            // Get the "light vector" pointing to the light.
+            // FIXME: this is wrong
             radiance += entity.material.f(
+                // TODO: get direction to light.
                 &intersection.normal,
-                &intersection.normal,
+                &-ray.direction,
             ) * light.irradiance(&intersection.point, &intersection.normal)
         }
         radiance

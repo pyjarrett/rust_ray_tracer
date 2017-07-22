@@ -299,9 +299,12 @@ impl Mul<Vector> for Matrix4x4 {
 impl Mul<Ray> for Matrix4x4 {
     type Output = Ray;
     fn mul(self, r: Ray) -> Self::Output {
+        let mut new_direction = self * r.direction;
+        new_direction.normalize();
+
         Ray {
             origin: self * r.origin,
-            direction: self * r.direction,
+            direction: new_direction
         }
     }
 }
