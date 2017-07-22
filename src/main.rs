@@ -18,7 +18,7 @@ use clap::{App, SubCommand};
 fn render_multiple_spheres() {
     // Set up the camera, film and the recording source.
     let film = Film::new(400, 300);
-    let projection = Perspective::new(1.0, 1000.0, PlanarAngle::Degrees(45.0));
+    let projection = Perspective::new(1.0, 1000.0, PlanarAngle::Degrees(90.0));
     let mut image = image::ImageBuffer::new(film.width() as u32, film.height() as u32);
     let camera = Camera::new(&film, &projection);
 
@@ -40,11 +40,13 @@ fn render_multiple_spheres() {
         Matrix4x4::translate(0.0, 0.0, -30.0),
     );
 
+    /*
     scene.add_entity(
         Box::new(Sphere::new_with_radius(0.1)),
         Box::new(LambertianMaterial::new(&Vector::new(1.0, 0.0, 0.0))),
         Matrix4x4::translate(-0.2, 0.0, -30.0),
     );
+    */
 
     scene.add_entity(
         Box::new(Sphere::new_with_radius(0.1)),
