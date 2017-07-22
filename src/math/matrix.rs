@@ -6,10 +6,11 @@ use math::{Point, Ray, Vector};
 /// A row-major, 4x4 Matrix for use with homogeneous coordinate transforms.
 ///
 /// # Remarks
-/// Using a row-major ordering of matrix elements allows convenient indexing of the matrix using
-/// `m[row][col]`.  However, matrix element memory ordering is independent of the notation to
+/// Using a row-major memory ordering of matrix elements allows convenient indexing of the matrix
+/// using `m[row][col]`.  However, matrix element memory ordering is independent of the notation to
 /// specify multiplications.  Note that the convention maintained is to treat vectors and points as
-/// columns, not rows so we use the convention `M * v` rather than `v * M`.
+/// columns, not rows so we use the post-multiply convention `M * v` rather than the pre-multiply
+/// convention `v * M`.
 ///
 /// The columns of this matrix show how the three basis vectors and the origin point for the
 /// current coordinate system will be transformed.
@@ -54,8 +55,32 @@ impl Matrix4x4 {
         }
     }
 
-    pub fn perspective(near: f32, far: f32, fov_radians: f32) -> Matrix4x4 {
-        let inv_tan_half_fov = 1.0 / ((fov_radians / 2.0).tan());
+    /// Generates a perspective transform, in a coordinate system with X+ going to the right,
+    /// Y+ going up, and Z+ going into the screen.
+    ///
+    /// Along the X and Y axes, the inverse tangent of the half the field of view (FOV) gives the
+    /// ratio of Z per unit in that direction.  The shorter dimension will scale to [-1, 1], and
+    /// the large dimension according to the aspect ratio.  The smaller side of either X or Y will
+    /// be the side with the given FOV.  Note this is slightly different than the typical realtime
+    /// graphics perspective transform which uses the appropriate FOV for each X and Y axis based
+    /// on the desired frustum size from the frustum top->bottom and left->right sizes.
+    ///
+    /// The lower half of the matrix transforms the range of Z values from [near, far]
+    /// to [0, 1].
+    ///
+    /// # Arguments
+    /// * `near` - Z value of the near plane
+    /// * `far` - Z value of far plane
+    /// * `fov_degrees` - field of view in degrees
+    ///
+    /// # Preconditions
+    /// * `0 <= near < far`
+    /// # `0 < fov_degrees < 180 degrees`
+    pub fn perspective(near: f32, far: f32, fov_degrees: f32) -> Matrix4x4 {
+        assert!(0.0 <= near, "The distance to the near plane cannot be negative.");
+        assert!(near < far, "The near plane must be behind the far plane.");
+        let inv_tan_half_fov = 1.0 / ((fov_degrees.to_radians() / 2.0).tan());
+        assert!(inv_tan_half_fov > 0.0, "Invalid field of view: {} degrees", fov_degrees);
         Matrix4x4 {
             m: [
                 [inv_tan_half_fov, 0.0, 0.0, 0.0],
@@ -318,6 +343,38 @@ mod tests {
         assert_relative_eq!(translated.x, p.x);
         assert_relative_eq!(translated.y, p.y);
         assert_relative_eq!(translated.z, p.z);
+    }
+
+    #[test]
+    #[should_panic]
+    pub fn test_perspective_near_closer_than_far() {
+        Matrix4x4::perspective(100.0, 10.0, 45.0_f32);
+    }
+
+    #[test]
+    #[should_panic]
+    pub fn test_perspective_near_greater_than_0() {
+        Matrix4x4::perspective(-100.0, 10.0, 45.0_f32);
+    }
+
+    #[test]
+    #[should_panic]
+    pub fn test_perspective_fov_less_than_180() {
+        Matrix4x4::perspective(0.0, 100.0, 190.0_f32);
+    }
+
+    #[test]
+    pub fn test_perspective_frustrum_points() {
+        let near = 10.0;
+        let far = 100.0;
+        let p = Matrix4x4::perspective(near, far, 60.0_f32);
+
+        let center_near = Point::new(0.0, 0.0, near);
+        let center_mid = Point::new(0.0, 0.0, (far - near) / 2.0);
+        let center_far = Point::new(0.0, 0.0, far);
+
+        assert_relative_eq!((p * center_near).z, 0.0);
+        assert_relative_eq!((p * center_far).z, 1.0);
     }
 
     #[test]
