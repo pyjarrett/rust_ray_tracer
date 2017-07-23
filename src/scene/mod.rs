@@ -33,7 +33,7 @@ pub type Spectrum = Vector;
 
 /// Some thing with a shape, and material properties.
 struct Entity {
-    shape: Box<Solid>,
+    solid: Box<Solid>,
     material: Box<Material>,
 
     // Transform into and out of this entity's coordinate space.
@@ -44,7 +44,7 @@ impl Solid for Entity {
     fn intersect(&self, r: &Ray) -> Option<Intersection> {
         let local_ray = self.transform.to_local * (*r);
 
-        if let Some(intersection) = self.shape.intersect(&local_ray) {
+        if let Some(intersection) = self.solid.intersect(&local_ray) {
             // Convert the intersection back into the world coordinate system.
             return Some(self.transform.to_world * intersection);
         }
@@ -80,15 +80,15 @@ impl Scene {
         self.lights.push(light);
     }
 
-    /// TODO: Merge terminology of "shape" and "solid".
+    /// Creates an entity with given properties.
     ///
     /// # Arguments
-    /// * `shape` - the intersection bounds of the object to create
+    /// * `solid` - the intersection bounds of the object to create
     /// * `material` - material to apply to the object
     /// * `transform` - converts world coordinates to local coordinates
-    pub fn add_entity(&mut self, shape: Box<Solid>, material: Box<Material>, transform: Matrix4x4) {
+    pub fn add_entity(&mut self, solid: Box<Solid>, material: Box<Material>, transform: Matrix4x4) {
         self.entities.push(Box::new(Entity {
-            shape: shape,
+            solid: solid,
             material: material,
             transform: Transform {
                 to_local: transform.inverse().expect(

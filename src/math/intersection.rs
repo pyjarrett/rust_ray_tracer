@@ -28,4 +28,12 @@ impl Mul<Intersection> for Matrix4x4 {
 pub trait Solid {
     /// Provides intersection reporting against a ray.
     fn intersect(&self, r: &Ray) -> Option<Intersection>;
+
+    /// A simpler interface for just seeing if an intersection exists.
+    fn hits(&self, r: &Ray) -> bool {
+        match self.intersect(r) {
+            Some(_) => true,
+            None => false,
+        }
+    }
 }
