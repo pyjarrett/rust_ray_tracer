@@ -19,38 +19,16 @@
 /// A left-handed coordinate system with X to the right, Y is up, and Z is into the screen.
 pub mod camera;
 mod dimensions;
+pub mod material;
 pub use self::camera::{Camera, Film, Perspective, PlanarAngle, Projection};
 pub use self::dimensions::{BasicDimensions2, Dimensions2};
+pub use self::material::{LambertianMaterial, Material};
 
 use std::f32::INFINITY;
 use math::{Intersection, Matrix4x4, Point, Ray, Solid, Vector};
 
 // TODO: Define some set of units for this.
-type Spectrum = Vector;
-
-/// Materials determine the next ray direction of travel, as well as the describing the surface
-/// properties of the object.
-pub trait Material {
-    /// Materials are perfectly reflective by default.
-    ///
-    /// # Arguments
-    /// * `incident` - vector pointing into the material whose next direction must be determined.
-    /// * `normal` - vector perpendicular to the surface
-    ///
-    /// # Return
-    /// Either a reflected or refracted vector pointing in the new direction.
-    fn next_ray_direction(&self, incident: &Vector, normal: &Vector) -> Vector {
-        2.0 * (normal.dot(incident) * (*normal))
-    }
-
-    /// BRDF function giving ratio of differential outgoing radiance (dependent upon the view
-    /// vector) to differential irradiance, dependent upon the light direction.
-    ///
-    /// # Arguments
-    /// * `light` - light vector, points to the light
-    /// * `view` - view vector, points to the viewer.
-    fn f(&self, light: &Vector, view: &Vector) -> Spectrum;
-}
+pub type Spectrum = Vector;
 
 pub trait NonAreaLight {
     /// We use a simplified version of the BRDF in this case, so here use irradiance instead of
@@ -63,24 +41,6 @@ pub trait NonAreaLight {
     /// # Returns
     /// * `Spectrum` - the irradiance measured at the surface
     fn irradiance(&self, position: &Point, normal: &Vector) -> Spectrum;
-}
-
-/// Lambertian material consisting of a single diffuse color.
-pub struct LambertianMaterial {
-    diffuse: Spectrum,
-}
-
-impl LambertianMaterial {
-    pub fn new(diffuse: &Spectrum) -> LambertianMaterial {
-        LambertianMaterial { diffuse: *diffuse }
-    }
-}
-
-impl Material for LambertianMaterial {
-    #[allow(unused_variables)]
-    fn f(&self, light: &Vector, view: &Vector) -> Spectrum {
-        self.diffuse
-    }
 }
 
 /// Some thing with a shape, and material properties.
