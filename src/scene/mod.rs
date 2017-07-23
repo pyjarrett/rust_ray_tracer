@@ -18,7 +18,9 @@
 /// ## World space
 /// A left-handed coordinate system with X to the right, Y is up, and Z is into the screen.
 pub mod camera;
-pub use self::camera::{Camera, Dimensions2, Film, Perspective, PlanarAngle, Projection};
+mod dimensions;
+pub use self::camera::{Camera, Film, Perspective, PlanarAngle, Projection};
+pub use self::dimensions::{BasicDimensions2, Dimensions2};
 
 use std::f32::INFINITY;
 use math::{Intersection, Matrix4x4, Point, Ray, Solid, Vector};
