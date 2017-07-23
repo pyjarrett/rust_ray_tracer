@@ -183,6 +183,9 @@ impl Matrix4x4 {
 impl fmt::Display for Matrix4x4 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut res = write!(f, "┏ {:35} ┓\n", "");
+        if res.is_err() {
+            return res;
+        }
         for row in 0..4 {
             res =
                 write!(
@@ -197,7 +200,7 @@ impl fmt::Display for Matrix4x4 {
                 return res;
             }
         }
-        let mut res = write!(f, "┗ {:35} ┛\n", "");
+        res = write!(f, "┗ {:35} ┛\n", "");
         res
     }
 }
@@ -309,7 +312,7 @@ impl Mul<Ray> for Matrix4x4 {
     type Output = Ray;
     fn mul(self, r: Ray) -> Self::Output {
         let mut new_direction = self * r.direction;
-        new_direction.normalize();
+        new_direction.normalize().unwrap();
 
         Ray {
             origin: self * r.origin,

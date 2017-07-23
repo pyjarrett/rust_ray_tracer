@@ -6,11 +6,15 @@ use std::fs::File;
 use std::path::Path;
 
 mod math;
-use math::{Matrix4x4, Point, Sphere, Vector};
+use math::{Matrix4x4, Sphere, Vector};
 use math::Axis;
 
 mod scene;
 use scene::*;
+
+use scene::dimensions::Dimensions2;
+use scene::material::*;
+use scene::nonarea_light::*;
 
 extern crate clap;
 use clap::{App, SubCommand};

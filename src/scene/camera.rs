@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 use std::f32::consts::PI;
-use std::convert::From;
 use math::{Matrix4x4, Point, Ray};
 use scene::dimensions::{BasicDimensions2, Dimensions2};
 

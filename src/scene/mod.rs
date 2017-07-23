@@ -18,30 +18,18 @@
 /// ## World space
 /// A left-handed coordinate system with X to the right, Y is up, and Z is into the screen.
 pub mod camera;
-mod dimensions;
+pub mod dimensions;
+pub mod nonarea_light;
 pub mod material;
 pub use self::camera::{Camera, Film, Perspective, PlanarAngle, Projection};
-pub use self::dimensions::{BasicDimensions2, Dimensions2};
-pub use self::material::{LambertianMaterial, Material};
+use self::nonarea_light::NonAreaLight;
+use self::material::Material;
 
 use std::f32::INFINITY;
-use math::{Intersection, Matrix4x4, Point, Ray, Solid, Vector};
+use math::{Intersection, Matrix4x4, Ray, Solid, Vector};
 
 // TODO: Define some set of units for this.
 pub type Spectrum = Vector;
-
-pub trait NonAreaLight {
-    /// We use a simplified version of the BRDF in this case, so here use irradiance instead of
-    /// radiance.
-    ///
-    /// # Arguments
-    /// * `position` - point to illuminate with the light
-    /// * `normal` - the surface normal being illuminated.
-    ///
-    /// # Returns
-    /// * `Spectrum` - the irradiance measured at the surface
-    fn irradiance(&self, position: &Point, normal: &Vector) -> Spectrum;
-}
 
 /// Some thing with a shape, and material properties.
 struct Entity {
@@ -72,31 +60,6 @@ impl Solid for Entity {
 pub struct Transform {
     pub to_local: Matrix4x4,
     pub to_world: Matrix4x4,
-}
-
-pub struct DirectionalLight {
-    direction: Vector,
-    radiance: Spectrum,
-}
-
-impl DirectionalLight {
-    pub fn new(direction: &Vector, radiance: &Spectrum) -> DirectionalLight {
-        let mut d = *direction;
-        d.normalize().expect(
-            "Provide a direction vector which cannot be normalized for a directional light.",
-        );
-        DirectionalLight {
-            direction: d,
-            radiance: *radiance,
-        }
-    }
-}
-
-impl NonAreaLight for DirectionalLight {
-    #[allow(unused_variables)]
-    fn irradiance(&self, position: &Point, normal: &Vector) -> Spectrum {
-        (-self.direction).dot(&normal).max(0.0) * self.radiance
-    }
 }
 
 pub struct Scene {
@@ -143,7 +106,7 @@ impl Scene {
     /// * `ray` - a ray emanating from the camera from the viewer, along which the radiance
     /// should be determined.
     ///
-    /// # Return
+    /// # Returns
     /// * `Spectrum` - the radiance along this ray in the opposite direction.
     pub fn trace(&self, ray: &Ray) -> Spectrum {
         // Find the closest entity being intersected.
