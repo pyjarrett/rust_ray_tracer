@@ -10,12 +10,13 @@
 /// The near plane is a Z=0 and the far plane at Z=1.
 ///
 /// ## Raster Space
-///
 /// The coordinates for pixels (sample positions) on the image.
 ///
-/// X range is [0, width], and Y range is [0, height] with (0,0) in the lower left
-/// corner.
-
+/// X range is [0, width], and Y range is [0, height] with (0,0) in the top left
+/// corner.  This matches the way images are represented.
+///
+/// ## World space
+/// A left-handed coordinate system with X to the right, Y is up, and Z is into the screen.
 pub mod camera;
 pub use self::camera::{Camera, Dimensions2, Film, Perspective, PlanarAngle, Projection};
 
@@ -165,10 +166,10 @@ impl Scene {
             shape: shape,
             material: material,
             transform: Transform {
-                to_local: transform,
-                to_world: transform.inverse().expect(
+                to_local: transform.inverse().expect(
                     "Uninvertible transform used for an entity.",
                 ),
+                to_world: transform,
             },
         }));
     }

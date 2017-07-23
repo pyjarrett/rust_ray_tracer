@@ -77,10 +77,17 @@ impl Matrix4x4 {
     /// * `0 <= near < far`
     /// # `0 < fov_degrees < 180 degrees`
     pub fn perspective(near: f32, far: f32, fov_degrees: f32) -> Matrix4x4 {
-        assert!(0.0 <= near, "The distance to the near plane cannot be negative.");
+        assert!(
+            0.0 <= near,
+            "The distance to the near plane cannot be negative."
+        );
         assert!(near < far, "The near plane must be behind the far plane.");
         let inv_tan_half_fov = 1.0 / ((fov_degrees.to_radians() / 2.0).tan());
-        assert!(inv_tan_half_fov > 0.0, "Invalid field of view: {} degrees", fov_degrees);
+        assert!(
+            inv_tan_half_fov > 0.0,
+            "Invalid field of view: {} degrees",
+            fov_degrees
+        );
         Matrix4x4 {
             m: [
                 [inv_tan_half_fov, 0.0, 0.0, 0.0],
@@ -175,20 +182,22 @@ impl Matrix4x4 {
 
 impl fmt::Display for Matrix4x4 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut res = write!(f, "\n");
+        let mut res = write!(f, "┏ {:35} ┓\n", "");
         for row in 0..4 {
-            res = write!(
+            res =
+                write!(
                 f,
-                "{:>8.4} {:>8.4} {:>8.4} {:>8.4}\n",
+                "┃ {:>8.4} {:>8.4} {:>8.4} {:>8.4} ┃\n",
                 self.m[row][0],
                 self.m[row][1],
                 self.m[row][2],
-                self.m[row][3]
+                self.m[row][3],
             );
             if res.is_err() {
                 return res;
             }
         }
+        let mut res = write!(f, "┗ {:35} ┛\n", "");
         res
     }
 }
@@ -304,7 +313,7 @@ impl Mul<Ray> for Matrix4x4 {
 
         Ray {
             origin: self * r.origin,
-            direction: new_direction
+            direction: new_direction,
         }
     }
 }

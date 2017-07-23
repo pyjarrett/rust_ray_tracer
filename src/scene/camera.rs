@@ -63,16 +63,19 @@ pub struct Film {
 
 impl Film {
     /// Converting from screen to raster:
-    /// 1.) Offset the screen by half its dimensions so all X,Y coordinates become non-negative.
-    /// 2.) Squash the screen so X, Y range from [0, 1].
-    /// 3.) Scale to the raster range X in [0, raster_width], Y in [0, raster_height].
+    /// 1.) Flip along the Y-axis, so _top_ left will end up as (0, 0).
+    /// 2.) Offset the screen by half its dimensions so all X,Y coordinates become non-negative.
+    /// 3.) Squash the screen so X, Y range from [0, 1].
+    /// 4.) Scale to the raster range X in [0, raster_width], Y in [0, raster_height].
     pub fn new(width: u16, height: u16) -> Film {
         let size = BasicDimensions2::<u16>::new(width, height);
         let screen = Film::screen_space_from_aspect_ratio(size.aspect_ratio());
 
-        let screen_to_raster = Matrix4x4::scale(size.width() as f32, size.height() as f32, 1.0) *
+        let screen_to_raster = //Matrix4x4::scale(1.0, -1.0, 1.0) *
+            Matrix4x4::scale(size.width() as f32, size.height() as f32, 1.0) *
             Matrix4x4::scale(1.0 / screen.width(), 1.0 / screen.height(), 1.0) *
-            Matrix4x4::translate(screen.width() / 2.0, screen.height() / 2.0, 0.0);
+            Matrix4x4::translate(screen.width() / 2.0, screen.height() / 2.0, 0.0) *
+            Matrix4x4::scale(1.0, -1.0, 1.0);
 
         Film {
             size: size,
@@ -204,10 +207,17 @@ impl Camera {
     }
 
     /// Generates a ray for use in ray tracing.
+    ///
+    /// # Arguments
+    /// * `x` - x coordinate on the raster to trace
+    /// # `y` - y coordinate on the raster to trace
+    ///
+    /// # Returns
+    /// A ray going through (x, y) on the raster.
     pub fn generate_ray(&self, x: u32, y: u32) -> Ray {
         let origin = Point::new(0.0, 0.0, 0.0);
-        let image_plane = self.raster_to_camera * Point::new(x as f32, y as f32, 0.0);
-        let direction = image_plane - origin;
+        let image_plane_pos = self.raster_to_camera * Point::new(x as f32, y as f32, 0.0);
+        let direction = image_plane_pos - origin;
 
         let mut ray = Ray {
             origin: origin,

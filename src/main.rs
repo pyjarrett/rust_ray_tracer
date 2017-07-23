@@ -25,36 +25,30 @@ fn render_multiple_spheres() {
     // Build the scene.
     let mut scene = Scene::new();
     scene.add_light(Box::new(DirectionalLight::new(
-        &Vector::new(0.0, 1.0, 0.0),
+        &Vector::new(0.0, 0.0, 1.0),
         &Vector::new(1.0, 1.0, 1.0),
-    )));
-
-    scene.add_light(Box::new(DirectionalLight::new(
-        &Vector::new(0.0, -1.0, 0.0),
-        &Vector::new(0.0, 1.0, 1.0),
     )));
 
     scene.add_entity(
         Box::new(Sphere::new_with_radius(0.1)),
         Box::new(LambertianMaterial::new(&Vector::new(0.0, 0.0, 1.0))),
-        Matrix4x4::translate(0.0, 0.0, -30.0),
+        Matrix4x4::translate(0.0, 0.0, 30.0),
     );
-
-    /*
-    scene.add_entity(
-        Box::new(Sphere::new_with_radius(0.1)),
-        Box::new(LambertianMaterial::new(&Vector::new(1.0, 0.0, 0.0))),
-        Matrix4x4::translate(-0.2, 0.0, -30.0),
-    );
-    */
 
     scene.add_entity(
         Box::new(Sphere::new_with_radius(0.1)),
         Box::new(LambertianMaterial::new(&Vector::new(1.0, 0.0, 0.0))),
-        Matrix4x4::translate(0.2, 0.0, -30.0),
+        Matrix4x4::translate(0.2, 0.4, 30.0),
+    );
+
+    scene.add_entity(
+        Box::new(Sphere::new_with_radius(0.1)),
+        Box::new(LambertianMaterial::new(&Vector::new(1.0, 0.0, 0.0))),
+        Matrix4x4::translate(0.2, 0.0, 30.0),
     );
 
     // Generates samples for all film points.
+    // (0, 0) is the top left corner.
     for (x, y, pixel) in image.enumerate_pixels_mut() {
         let ray = camera.generate_ray(x, y);
 
@@ -92,8 +86,7 @@ fn main() {
 
     if let Some(_) = matches.subcommand_matches("scene") {
         render_multiple_spheres();
-    }
-    else {
+    } else {
         println!("Unhandled render command.");
     }
 }
