@@ -23,6 +23,7 @@ digraph Graphics {
     orientation -> basis [label="describes"];
 
     basis -> coordinate_system [label="part of"];
+    basis -> orthonormal [label="axes mutually orthogonal\n and length 1"];
 
     coordinate_system -> left_handed [label="might be"];
     coordinate_system -> right_handed [label="might be"];
@@ -37,23 +38,21 @@ digraph Graphics {
     euler_angles -> {roll, pitch, yaw} [label="composed of"]
     euler_angles -> euler_transform [label="creates a"]
 
-    matrix4x4 -> orthogonal [label="transpose is inverse"]
-
     transform -> rigid_body_transform [label="T * R"]
-
-    basis -> orthonormal [label="axes mutually orthogonal\n and length 1"];
     transform -> {euler_transform, scale, shear, rotation, translation} [label="a type of"]
 
     affine_transform -> {linear_transform, translation} [label="composed of"]
 
+    matrix4x4 -> orthogonal [label="when transpose is inverse"]
+    euler_transform -> orthogonal [label="is"]
+    rotation -> orthogonal [label="is"]
+
     orthographic -> affine_transform [label="is"]
     euler_transform -> affine_transform [label="is"]
-    euler_transform -> orthogonal [label="is"]
     scale -> affine_transform [label="is"]
     translation -> affine_transform [label="is"]
     rotation -> affine_transform [label="is"]
     shear -> affine_transform [label="is"]
-    rotation -> orthogonal [label="is"]
 
   /************************************/
   /*        Shapes                    */
@@ -66,10 +65,11 @@ digraph Graphics {
     surface -> BRDF [label="may have a"]
     surface -> BSSRDF [label="may have a"]
     surface -> tangent_vector [label="defines S & T"]
-    surface -> ray [label="reflects\n and refracts"]
+    surface -> surface_reflection [label="results in"]
 
     surface -> reflection_ray [label="rays from"]
     surface -> transparency_ray [label="rays through"]
+    transparency_ray -> refraction [label="traces"]
 
   /************************************/
   /*         Units for light          */
@@ -122,7 +122,6 @@ digraph Graphics {
     illumination_rays
     shadow_rays
     reflection_ray -> reflection [label="traces"]
-    transparency_rays -> refraction [label="traces"]
 
   /************************************/
   /*         Camera                   */
@@ -173,7 +172,6 @@ digraph Graphics {
     monte_carlo -> integrals [label="can approximate"]
     integrals -> closed_form [label="simple"]
     integrals -> open_form [label="complex"]
-    open_form -> monte_carlo [label="require use of"]
 
     rendering_equation -> BRDF [label="uses"]
     rendering_equation -> radiance [label="describes"]
@@ -225,33 +223,64 @@ digraph Graphics {
     solid_angle -> planar_angle [label="3D equivalent"];
 
 
-    { rank=same; ray, normal, tangent_vector }
-    { rank=same; point, vector };
+    subgraph cluster_math_types {
+      style=invis;
 
-    normal
+      { rank=same; ray, normal, tangent_vector }
+      { rank=same; point, vector };
 
-    matrix3x3
-    matrix4x4
+      matrix3x3
+      matrix4x4
+    }
+
+    subgraph cluster_transforms {
+      style=invis;
+
+      //orthographic 
+
+      { rank=same; orthogonal, affine_transform }
+      { rank=same; euler_transform, scale, translation, rotation, shear }
+
+      linear_transform
+    }
+
+    subgraph cluster_orientations {
+      style=invis;
+
+      orientation
+      basis
+    }
 
     perspective_divide
 
-    affine_transform
-    linear_transform
-    quaternion
+    subgraph cluster_rotation_types {
+      style=invis;
 
-    plane
-    sphere
-    frustum
-    cube
+      { rank=same; quaternion, euler_angles, rotation }
+    }
 
-    joule
-    watt
+    subgraph cluster_shape_types {
+      style=invis;
 
-    radiant_energy
-    radiant_flux
-    radiant_intensity
-    irradiance
-    radiance
+      plane
+      sphere
+      frustum
+      cube
+    }
+
+    subgraph cluster_light_units {
+      style=invis;
+
+      joule
+      watt
+      radiant_energy
+      radiant_flux
+      radiant_intensity
+      irradiance
+      radiance
+    }
+
+    radiance -> light_sources [label="produced by"]
 
     area
     projected_area
