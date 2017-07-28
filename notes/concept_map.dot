@@ -1,0 +1,280 @@
+digraph Graphics {
+  node [shape=box];/*, style=filled];*/
+  edge [arrowhead=normal, arrowtail=dot];
+  rankdir=LR;
+
+  /************************************/
+  /*      Mathematical units          */
+  /************************************/
+    ray -> point [label="has origin"]
+    ray -> vector [label="has direction"]
+    vector -> normal [label="when defining\n 'perpendicular'\n to a surface\n is a"]
+
+    matrix4x4 -> point [label="transforms"]
+    matrix4x4 -> ray [label="transforms"]
+    matrix4x4 -> vector [label="transforms"]
+    matrix4x4 -> coordinate_system [label="defines"]
+
+    matrix3x3 -> normal [label="transforms"]
+    matrix3x3 -> vector [label="transforms"]
+    matrix3x3 -> orientation [label="defines"];
+
+    orientation -> rotation [label="describes"];
+    orientation -> basis [label="describes"];
+
+    basis -> coordinate_system [label="part of"];
+
+    coordinate_system -> left_handed [label="might be"];
+    coordinate_system -> right_handed [label="might be"];
+    coordinate_system -> cartesian_coordinates [label="described in"]
+    coordinate_system -> spherical_coordinates [label="described in"]
+
+  /************************************/
+  /*      Transformations             */
+  /************************************/
+    quaternion -> rotation [label="describes a"]
+    euler_angles -> orientation [label="describes"]
+    euler_angles -> {roll, pitch, yaw} [label="composed of"]
+    euler_angles -> euler_transform [label="creates a"]
+
+    matrix4x4 -> orthogonal [label="transpose is inverse"]
+
+    transform -> rigid_body_transform [label="T * R"]
+
+    basis -> orthonormal [label="axes mutually orthogonal\n and length 1"];
+    transform -> {euler_transform, scale, shear, rotation, translation} [label="a type of"]
+
+    affine_transform -> {linear_transform, translation} [label="composed of"]
+
+    orthographic -> affine_transform [label="is"]
+    euler_transform -> affine_transform [label="is"]
+    euler_transform -> orthogonal [label="is"]
+    scale -> affine_transform [label="is"]
+    translation -> affine_transform [label="is"]
+    rotation -> affine_transform [label="is"]
+    shear -> affine_transform [label="is"]
+    rotation -> orthogonal [label="is"]
+
+  /************************************/
+  /*        Shapes                    */
+  /************************************/
+
+    {plane, sphere, cube} -> surface [label="define a"]
+    frustum -> plane [label="constructed\n from 6"]
+
+    surface -> normal [label="has a"]
+    surface -> BRDF [label="may have a"]
+    surface -> BSSRDF [label="may have a"]
+    surface -> tangent_vector [label="defines S & T"]
+    surface -> ray [label="reflects\n and refracts"]
+
+    surface -> reflection_ray [label="rays from"]
+    surface -> transparency_ray [label="rays through"]
+
+  /************************************/
+  /*         Units for light          */
+  /************************************/
+    spectrum -> wavelengths [label="composed of"]
+
+    area -> projected_area [label="multiplied by\n angle between\n light and surface normal"]
+
+    radiant_energy -> joule [label="measured in"]
+    joule -> radiant_flux [label="per second"]
+    joule -> watt [label="per second"]
+    radiant_flux -> irradiance [label="density with respect to area"]
+    radiant_flux -> radiant_intensity [label="density with respect\n to solid angle"]
+    
+    radiant_intensity -> radiance [label="density with respect\n to projected area"]
+
+    irradiance -> radiant_exitance [label="from a surface"]
+    irradiance -> radiance [label="density per\nsolid angle"]
+
+    luminance -> sensor [label="defines\n brightness for"]
+    radiance -> sensor [label="measured by"]
+
+    radiance -> spectrum [label="reported as"]
+
+  /************************************/
+  /*      Material representation     */
+  /************************************/
+    BRDF -> energy_conserving [label="must be"]
+    BRDF -> point [label="reflection\n from"]
+    BRDF -> helmholtz_reciprocity [label="obeys"]
+
+    surface_reflection -> {BRDF, BSSRDF}
+
+    refraction -> BTDF [label="uses"]
+    refraction -> snells_lay [label="obeys"]
+    refraction -> transmission [label="also called"]
+
+    reflection -> total_internal_reflection [label="angle where no\n refraction occurs"]
+    total_internal_reflection -> critical_angle [label="occurs beyond"]
+
+    light_sources -> {point_light, directional_light, area_light, infinite_area_light}
+    reflection_models
+    metropolis_sampling
+
+  /************************************/
+  /*      Ray Tracing                 */
+  /************************************/
+    pixel_rays -> image_plane [label="sample"]
+    pixel_rays -> eye_rays [label="also called"]
+    illumination_rays
+    shadow_rays
+    reflection_ray -> reflection [label="traces"]
+    transparency_rays -> refraction [label="traces"]
+
+  /************************************/
+  /*         Camera                   */
+  /************************************/
+
+    projection -> matrix4x4 [label="expressed as a"]
+
+    camera -> projection [label="defines a"]
+    camera -> frustum [label="defines a"]
+    camera -> aspect_ratio [label="has a"]
+    camera -> image_plane [label="defines a"]
+
+    camera -> lens [label="uses a"]
+    lens -> depth_of_field [label="causes"]
+
+    perspective -> projection [label="type of"]
+    orthographic -> projection [label="type of"]
+    perspective -> perspective_divide [label="uses on\n points"]
+
+    orthographic -> cube [label="defines a"]
+    perspective -> frustum [label="defines a"]
+
+    image_plane -> radiance [label="measures"]
+
+  /************************************/
+  /*      Coordinate spaces           */
+  /************************************/
+    screen_space -> screen_coordinates [label="uses"]
+    raster_space -> window_coordinates [label="uses"]
+
+    world_space -> object_space [label="each object\n has a"]
+    object_space -> camera_space [label="for camera"]
+    camera -> camera_space [label="transform\n in world\n defines"]
+    camera_space -> eye_space [label="also called"]
+    screen_space -> image_plane [label="defined on"]
+    screen_space -> raster_space [label="map to\n image samples"]
+
+    aspect_ratio -> screen_space [label="represented as"]
+  
+  /************************************/
+  /*      Integration                 */
+  /************************************/
+    simulating_randomness -> las_vegas [label="deterministic_outcome"]
+    simulating_randomness -> monte_carlo [label="approximate_outcome"]
+    las_vegas -> quicksort [label="example use"]
+
+    rendering_equation -> integrals [label="type of"]
+    monte_carlo -> integrals [label="can approximate"]
+    integrals -> closed_form [label="simple"]
+    integrals -> open_form [label="complex"]
+    open_form -> monte_carlo [label="require use of"]
+
+    rendering_equation -> BRDF [label="uses"]
+    rendering_equation -> radiance [label="describes"]
+    rendering_equation -> sensor [label="measured by"]
+
+    probability_density_function
+    random_variable -> cumulative_distribution_function [label="probability a\n random variable\n is <= x"]
+    random_variable -> probability_density_function [label="relative probability\n of taking on a\n particular value"]
+    random_variable -> distribution [label="pulled from"]
+
+    uniform_random_variable
+    uniform_random_variable -> canonical_uniform_random_variable [label="uniform\n probability\n in [0, 1)"]
+
+    distribution -> expected_value [label="average value\n over a distribution"]
+    {uniform_distribution, power_distribution, exponential_distribution} -> distribution [label="example of"]
+    uniform_distribution -> uniform_random_variable [label="provides"]
+
+    distribution -> sampling [label="taking samples"]
+    sampling -> inversion_method [label="sample CDF of\n desired distribution\n using a uniform\n random variable"]
+    inversion_method -> cumulative_distribution_function [label="uses"]
+    sampling -> rejection_method [label="dart throwing approach"]
+    sampling -> metropolis_sampling [label="mutation and acceptance"]
+
+  /************************************/
+  /*      Uncategorized               */
+  /************************************/
+
+  /************************************/
+  /* Things which are graphviz keywords. */
+  /************************************/
+  /*
+  width
+  height
+  */
+
+    /* OpenGL range (-1, -1, -1) -> (1, 1, 1)
+      DirectX Range (-1, -1, 0) -> (1, 1, 1)
+      */
+    canonical_view_volume
+    canonical_view_volume -> normalized_device_coordinates [label="has coordinates\n called "]
+    anti_aliasing
+    supersampling
+
+    /************************************/
+    /*         Angles                   */
+    /************************************/
+    planar_angle
+    solid_angle
+    solid_angle -> planar_angle [label="3D equivalent"];
+
+
+    { rank=same; ray, normal, tangent_vector }
+    { rank=same; point, vector };
+
+    normal
+
+    matrix3x3
+    matrix4x4
+
+    perspective_divide
+
+    affine_transform
+    linear_transform
+    quaternion
+
+    plane
+    sphere
+    frustum
+    cube
+
+    joule
+    watt
+
+    radiant_energy
+    radiant_flux
+    radiant_intensity
+    irradiance
+    radiance
+
+    area
+    projected_area
+
+    luminance
+    sensor
+
+    spectrum
+
+    helmholtz_reciprocity
+
+    { rank=same; BRDF, BSSRDF }
+
+    camera
+
+    projection
+
+    { rank=same; perspective, orthographic }
+    aspect_ratio
+
+    camera_space
+    world_space
+    object_space
+    screen_space
+    raster_space
+}
