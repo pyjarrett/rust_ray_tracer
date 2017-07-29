@@ -1,22 +1,24 @@
+//! Lights, camera, materials, and dimensions!
+//!
+//! # Coordinate spaces
+//! ## Screen space
+//! Screen space defined by the image plane of the viewing frustum
+//! centered at (0, 0).
+//!
+//! On the more limiting dimension of width or height, screen space extends from -1 to 1.  The
+//! larger dimension will extend from `-aspect_ratio` to `+aspect_ratio`.
+//!
+//! The near plane is a Z=0 and the far plane at Z=1.
+//!
+//! ## Raster Space
+//! The coordinates for pixels (sample positions) on the image.
+//!
+//! X range is [0, width], and Y range is [0, height] with (0,0) in the top left
+//! corner.  This matches the way images are represented.
+//!
+//! ## World space
+//! A left-handed coordinate system with X to the right, Y is up, and Z is into the screen.
 #![allow(dead_code)]
-/// # Coordinate spaces
-/// ## Screen space
-/// Screen space defined by the image plane of the viewing frustum
-/// centered at (0, 0).
-///
-/// On the more limiting dimension of width or height, screen space extends from -1 to 1.  The
-/// larger dimension will extend from `-aspect_ratio` to `+aspect_ratio`.
-///
-/// The near plane is a Z=0 and the far plane at Z=1.
-///
-/// ## Raster Space
-/// The coordinates for pixels (sample positions) on the image.
-///
-/// X range is [0, width], and Y range is [0, height] with (0,0) in the top left
-/// corner.  This matches the way images are represented.
-///
-/// ## World space
-/// A left-handed coordinate system with X to the right, Y is up, and Z is into the screen.
 pub mod camera;
 pub mod dimensions;
 pub mod nonarea_light;

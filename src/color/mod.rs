@@ -1,3 +1,4 @@
+//! Utility functions for dealing with color.
 #![allow(dead_code)]
 
 use math::Vector;
@@ -13,4 +14,3 @@ pub fn float_to_hue(f: f32) -> u8 {
 pub fn unit_vector_as_color(v: Vector) -> [u8; 3] {
     [float_to_hue(v.x), float_to_hue(v.y), float_to_hue(v.z)]
 }
-
