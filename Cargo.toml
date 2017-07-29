@@ -8,6 +8,7 @@ doc = false
 image = "0.10.3"
 approx = "0.1.1"
 clap = "2.25.0"
+rand = "0.3.16"
 
 [lib]
 name = "rrt"
