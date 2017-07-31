@@ -1,5 +1,6 @@
 use std::cmp::Eq;
 use std::fmt;
+use std::convert::From;
 use std::ops::{Add, Sub, Mul, Index};
 use math::{Axis, Vector};
 
@@ -74,6 +75,12 @@ impl PartialEq for Point {
 
 impl Eq for Point {}
 
+
+impl From<Point> for Vector {
+    fn from(p: Point) -> Self {
+        Vector::new(p.x, p.y, p.z)
+    }
+}
 
 impl fmt::Display for Point {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

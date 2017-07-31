@@ -1,7 +1,6 @@
 use std::ops::{Add, AddAssign, Sub, Mul, Div, Neg, Index};
-use std::convert::From;
 use std::fmt;
-use math::{Axis, Point};
+use math::Axis;
 
 // TODO: Move these into an approximation library.
 const MIN_LENGTH_FOR_NORMALIZATION: f32 = 1e-6;
@@ -132,12 +131,6 @@ impl Index<Axis> for Vector {
             Axis::Y => &self.y,
             Axis::Z => &self.z,
         }
-    }
-}
-
-impl From<Point> for Vector {
-    fn from(p: Point) -> Self {
-        Vector::new(p.x, p.y, p.z)
     }
 }
 
