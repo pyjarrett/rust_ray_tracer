@@ -10,6 +10,9 @@ digraph Graphics {
     ray -> vector [label="has direction"]
     vector -> normal [label="when defining\n 'perpendicular'\n to a surface\n is a"]
 
+    normal -> unit_vector [label="is a"]
+    vector -> unit_vector [label="of length 1"]
+
     matrix4x4 -> point [label="transforms"]
     matrix4x4 -> ray [label="transforms"]
     matrix4x4 -> vector [label="transforms"]
@@ -65,6 +68,7 @@ digraph Graphics {
     surface -> BRDF [label="may have a"]
     surface -> BSSRDF [label="may have a"]
     surface -> tangent_vector [label="defines S & T"]
+    tangent_vector -> unit_vector [label="is a"]
     surface -> surface_reflection [label="results in"]
 
     surface -> reflection_ray [label="rays from"]
@@ -104,7 +108,7 @@ digraph Graphics {
     surface_reflection -> {BRDF, BSSRDF}
 
     refraction -> BTDF [label="uses"]
-    refraction -> snells_lay [label="obeys"]
+    refraction -> snells_law [label="obeys"]
     refraction -> transmission [label="also called"]
 
     reflection -> total_internal_reflection [label="angle where no\n refraction occurs"]
@@ -166,23 +170,28 @@ digraph Graphics {
   /************************************/
     simulating_randomness -> las_vegas [label="deterministic_outcome"]
     simulating_randomness -> monte_carlo [label="approximate_outcome"]
+    {rank=same; las_vegas, monte_carlo}
+
     las_vegas -> quicksort [label="example use"]
 
     rendering_equation -> integrals [label="type of"]
+    monte_carlo -> random_variable [label="uses at least 1"]
     monte_carlo -> integrals [label="can approximate"]
     integrals -> closed_form [label="simple"]
     integrals -> open_form [label="complex"]
+
+    {rank=same; open_form, closed_form}
 
     rendering_equation -> BRDF [label="uses"]
     rendering_equation -> radiance [label="describes"]
     rendering_equation -> sensor [label="measured by"]
 
-    probability_density_function
-    random_variable -> cumulative_distribution_function [label="probability a\n random variable\n is <= x"]
-    random_variable -> probability_density_function [label="relative probability\n of taking on a\n particular value"]
     random_variable -> distribution [label="pulled from"]
+    random_variable -> probability_density_function [label="relative probability\n of taking on a\n particular value"]
+    random_variable -> cumulative_distribution_function [label="probability a\n random variable\n is <= x"]
 
-    uniform_random_variable
+    probability_density_function -> cumulative_distribution_function [label="integral over"]
+
     uniform_random_variable -> canonical_uniform_random_variable [label="uniform\n probability\n in [0, 1)"]
 
     distribution -> expected_value [label="average value\n over a distribution"]
@@ -194,6 +203,9 @@ digraph Graphics {
     inversion_method -> cumulative_distribution_function [label="uses"]
     sampling -> rejection_method [label="dart throwing approach"]
     sampling -> metropolis_sampling [label="mutation and acceptance"]
+
+    {rank=same; uniform_distribution, power_distribution, exponential_distribution}
+
 
   /************************************/
   /*      Uncategorized               */
@@ -241,7 +253,11 @@ digraph Graphics {
       { rank=same; orthogonal, affine_transform }
       { rank=same; euler_transform, scale, translation, rotation, shear }
 
+      { rank=same; cartesian_coordinates, spherical_coordinates}
+
       linear_transform
+      orientation
+      basis
     }
 
     subgraph cluster_orientations {
@@ -293,6 +309,20 @@ digraph Graphics {
     helmholtz_reciprocity
 
     { rank=same; BRDF, BSSRDF }
+
+    subgraph cluster_sampling {
+      style=invis;
+
+      uniform_distribution
+      exponential_distribution
+      power_distribution
+      distribution
+      sampling
+      rejection_method
+      inversion_method
+      metropolis_sampling
+    }
+
 
     camera
 
