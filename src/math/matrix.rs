@@ -1,7 +1,10 @@
-use std::fmt;
-use std::cmp::Eq;
-use std::ops::Mul;
+extern crate approx;
+
+use approx::ApproxEq;
 use math::{Point, Ray, Vector};
+use std::f32;
+use std::fmt;
+use std::ops::Mul;
 
 /// A row-major, 4x4 Matrix for use with homogeneous coordinate transforms.
 ///
@@ -178,11 +181,21 @@ impl Matrix4x4 {
         }
         Some(inv)
     }
+
+    pub fn transpose(&self) -> Matrix4x4 {
+        let mut n: [[f32; 4]; 4] = [[0.0; 4]; 4];
+        for i in 0..4 {
+            for j in 0..4 {
+                n[i][j] = self.m[j][i];
+            }
+        }
+        Matrix4x4 { m: n }
+    }
 }
 
-impl fmt::Display for Matrix4x4 {
+impl fmt::Debug for Matrix4x4 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut res = write!(f, "┏ {:35} ┓\n", "");
+        let mut res = write!(f, "\n┏ {:35} ┓\n", "");
         if res.is_err() {
             return res;
         }
@@ -205,11 +218,37 @@ impl fmt::Display for Matrix4x4 {
     }
 }
 
-impl PartialEq for Matrix4x4 {
-    fn eq(&self, other: &Matrix4x4) -> bool {
+impl ApproxEq for Matrix4x4 {
+    type Epsilon = <f32 as ApproxEq>::Epsilon;
+
+    fn default_epsilon() -> Self::Epsilon {
+        f32::default_epsilon()
+    }
+
+    fn default_max_relative() -> Self::Epsilon {
+        f32::default_max_relative()
+    }
+
+    // ulps = Units in Last Place
+    fn default_max_ulps() -> u32 {
+        f32::default_max_ulps()
+    }
+
+    fn relative_eq(&self, other: &Self, epsilon: Self::Epsilon, max_relative: Self::Epsilon) -> bool {
         for i in 0..4 {
             for j in 0..4 {
-                if (self.m[i][j] - other.m[i][j]).abs() > 1e-6 {
+                if !f32::relative_eq(&self.m[i][j], &other.m[i][j], epsilon, max_relative) {
+                    return false;
+                }
+            }
+        }
+        true
+    }
+
+    fn ulps_eq(&self, other: &Self, epsilon: Self::Epsilon, max_ulps: u32) -> bool {
+        for i in 0..4 {
+            for j in 0..4 {
+                if !f32::ulps_eq(&self.m[i][j], &other.m[i][j], epsilon, max_ulps) {
                     return false;
                 }
             }
@@ -218,7 +257,6 @@ impl PartialEq for Matrix4x4 {
     }
 }
 
-impl Eq for Matrix4x4 {}
 
 impl Mul for Matrix4x4 {
     type Output = Matrix4x4;
@@ -335,8 +373,8 @@ mod tests {
         assert_relative_eq!(same_point.x, p.x);
         assert_relative_eq!(same_point.y, p.y);
         assert_relative_eq!(same_point.z, p.z);
-        assert!(m_inv == m);
-        assert!(m_inv * m == m * m_inv);
+        assert_relative_eq!(m_inv, m);
+        assert_relative_eq!(m_inv * m, m * m_inv);
     }
 
     #[test]
@@ -385,7 +423,6 @@ mod tests {
         let p = Matrix4x4::perspective(near, far, 60.0_f32);
 
         let center_near = Point::new(0.0, 0.0, near);
-        let center_mid = Point::new(0.0, 0.0, (far - near) / 2.0);
         let center_far = Point::new(0.0, 0.0, far);
 
         assert_relative_eq!((p * center_near).z, 0.0);
@@ -406,8 +443,8 @@ mod tests {
     pub fn test_inverse() {
         let m = Matrix4x4::scale(2.5, 4.0, 8.0) * Matrix4x4::translate(1.0, 3.0, 5.0);
         let m_inv = m.inverse().unwrap();
-        assert!(m * m_inv == Matrix4x4::identity());
-        assert!(m_inv * m == Matrix4x4::identity());
+        assert_relative_eq!(m * m_inv, Matrix4x4::identity());
+        assert_relative_eq!(m_inv * m, Matrix4x4::identity());
 
         let zero_matrix = Matrix4x4 { m: [[0.0; 4]; 4] };
         assert!(zero_matrix.inverse().is_none());

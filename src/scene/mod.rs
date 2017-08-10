@@ -117,7 +117,6 @@ impl Scene {
         let mut best_time: f32 = INFINITY;
 
         for ref obj in self.entities.iter() {
-            // TODO: Transform the ray into the local coordinate space of the object.
             if let Some(intersection) = obj.intersect(&ray) {
                 //println!("Intersection at {}", intersection.point);
                 if intersection.time < best_time && intersection.time > 0.0 {

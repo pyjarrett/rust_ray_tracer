@@ -1,4 +1,4 @@
-use math::{Intersection, Point, Ray, Solid, Vector};
+use math::{Intersection, Ray, Solid, Vector};
 
 /// An infinitely stretching plane defined by a normal, and the distance from the coordinate system
 /// origin to the plane.
@@ -21,7 +21,8 @@ impl Plane {
 impl Solid for Plane {
     fn intersect(&self, r: &Ray) -> Option<Intersection> {
         // Intersection time is determined by the t needed for the ray's point at that t to be
-        let normal = Vector::new(self.a, self.b, self.c);
+        let mut normal = Vector::new(self.a, self.b, self.c);
+        normal.normalize().expect("Plane has no normal...?");
         let v0 = -(normal.dot(&Vector::from(r.origin)) + self.d);
 
         // Ray is parallel to the plane.
@@ -40,9 +41,9 @@ impl Solid for Plane {
     }
 }
 
-
+#[cfg(test)]
 mod tests {
-    use math::{Intersection, Point, Ray, Solid, Vector};
+    use math::{Ray, Point, Solid, Vector};
     use super::Plane;
 
     #[test]

@@ -40,3 +40,31 @@ impl NonAreaLight for DirectionalLight {
         (-self.direction).dot(&normal).max(0.0) * self.radiance
     }
 }
+
+pub struct PointLight {
+    position: Point,
+    intensity: Spectrum,
+}
+
+impl PointLight {
+    pub fn new(position: Point, intensity: Spectrum) -> PointLight {
+        PointLight { position, intensity }
+    }
+}
+
+impl NonAreaLight for PointLight {
+    fn irradiance(&self, position: &Point, normal: &Vector) -> Spectrum {
+        let distance = position.distance_to(self.position);
+        let mut light_vector = self.position - *position;
+        light_vector.normalize().expect("Cannot normalize light vector");
+
+        let e = light_vector.dot(normal).max(0.0) * self.intensity / (distance * distance).min(1.0);
+
+        //println!("light vector {}", light_vector);
+        //println!("position {}", position);
+        //println!("normal {}", normal);
+        //println!("distance*distance {}", distance * distance);
+        //println!("e={}", e);
+        e
+    }
+}

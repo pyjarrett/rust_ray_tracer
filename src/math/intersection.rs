@@ -18,9 +18,7 @@ impl Mul<Intersection> for Matrix4x4 {
         Intersection {
             time: i.time,
             point: self * i.point,
-
-            // FIXME: Use a correct planar transform here.
-            normal: self * i.normal,
+            normal: self.inverse().unwrap().transpose() * i.normal,
         }
     }
 }
