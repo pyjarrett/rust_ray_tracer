@@ -18,14 +18,23 @@ use scene::nonarea_light::*;
 extern crate clap;
 use clap::{App, SubCommand};
 
-fn render_multiple_spheres() {
-    // Set up the camera, film and the recording source.
-    let film = Film::new(800, 600);
-    let projection = Perspective::new(1.0, 1000.0, PlanarAngle::Degrees(90.0));
-    let mut image = image::ImageBuffer::new(film.width() as u32, film.height() as u32);
-    let camera = Camera::new(&film, &projection);
+type ColorImage = image::ImageBuffer<image::Rgb<u8>, std::vec::Vec<u8>>;
 
-    // Build the scene.
+fn render_multiple_spheres() {
+    let film = Film::new(800, 600);
+    let mut image = ColorImage::new(film.width() as u32, film.height() as u32);
+
+    ray_cast(create_default_camera(&film), build_scene(), &mut image);
+
+    write_image(image, "scene.png");
+}
+
+fn create_default_camera(film: &Film) -> Camera {
+    let projection = Perspective::new(1.0, 1000.0, PlanarAngle::Degrees(90.0));
+    Camera::new(film, &projection)
+}
+
+fn build_scene() -> Scene {
     let mut scene = Scene::new();
 
     scene.add_light(Box::new(DirectionalLight::new(
@@ -51,10 +60,12 @@ fn render_multiple_spheres() {
         Matrix4x4::translate(0.2, 0.0, 30.0),
     );
 
+    /*
     scene.add_light(Box::new(PointLight::new(
         Point::new(0.0, 0.0, 30.0),
         1.0 * Vector::new(1.0, 1.0, 1.0),
     )));
+    */
 
     scene.add_entity(
         Box::new(Plane::new(0.0, 0.0, -1.0, 30.5)),
@@ -62,6 +73,10 @@ fn render_multiple_spheres() {
         Matrix4x4::identity(),
     );
 
+    scene
+}
+
+fn ray_cast(camera: Camera, scene: Scene, image: &mut ColorImage) {
     // Generates samples for all film points.
     // (0, 0) is the top left corner.
     for (x, y, pixel) in image.enumerate_pixels_mut() {
@@ -76,10 +91,10 @@ fn render_multiple_spheres() {
             ],
         );
     }
+}
 
-    // Write the scene.
-    let scene_name = "scene.png";
-    let ref mut fout = File::create(&Path::new(scene_name)).unwrap();
+fn write_image(image: ColorImage, file_name: &str) {
+    let ref mut fout = File::create(&Path::new(file_name)).unwrap();
     let _ = image::ImageRgb8(image).save(fout, image::PNG);
 }
 
