@@ -234,7 +234,12 @@ impl ApproxEq for Matrix4x4 {
         f32::default_max_ulps()
     }
 
-    fn relative_eq(&self, other: &Self, epsilon: Self::Epsilon, max_relative: Self::Epsilon) -> bool {
+    fn relative_eq(
+        &self,
+        other: &Self,
+        epsilon: Self::Epsilon,
+        max_relative: Self::Epsilon,
+    ) -> bool {
         for i in 0..4 {
             for j in 0..4 {
                 if !f32::relative_eq(&self.m[i][j], &other.m[i][j], epsilon, max_relative) {
