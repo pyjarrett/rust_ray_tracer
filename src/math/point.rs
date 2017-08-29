@@ -1,10 +1,11 @@
+use approx::ApproxEq;
 use std::cmp::Eq;
 use std::fmt;
 use std::convert::From;
 use std::ops::{Add, Sub, Mul, Index};
-use math::{Axis, Vector};
+use math::{Axis, Vector, XYZ};
 
-#[derive(Copy, Clone)]
+#[derive(Clone, Copy, Debug)]
 pub struct Point {
     pub x: f32,
     pub y: f32,
@@ -82,6 +83,45 @@ impl From<Point> for Vector {
     }
 }
 
+impl ApproxEq for Point {
+    type Epsilon = <f32 as ApproxEq>::Epsilon;
+
+    fn default_epsilon() -> Self::Epsilon {
+        f32::default_epsilon()
+    }
+
+    fn default_max_relative() -> Self::Epsilon {
+        f32::default_max_relative()
+    }
+
+    fn default_max_ulps() -> u32 {
+        f32::default_max_ulps()
+    }
+
+    fn relative_eq(
+        &self,
+        other: &Self,
+        epsilon: Self::Epsilon,
+        max_relative: Self::Epsilon,
+    ) -> bool {
+        for axis in &XYZ {
+            if !f32::relative_eq(&self[*axis], &other[*axis], epsilon, max_relative) {
+                return false;
+            }
+        }
+        true
+    }
+
+    fn ulps_eq(&self, other: &Self, epsilon: Self::Epsilon, max_ulps: u32) -> bool {
+        for axis in &XYZ {
+            if !f32::ulps_eq(&self[*axis], &other[*axis], epsilon, max_ulps) {
+                return false;
+            }
+        }
+        true
+    }
+}
+
 impl fmt::Display for Point {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[ {:>7.4} {:>7.4} {:>7.4} ]", self.x, self.y, self.z)
@@ -100,9 +140,9 @@ mod tests {
         let p3 = Point::new(1.0, 2.0, -3.0);
         let p1_eq = Point::new(1.0, 2.0, 3.0);
 
-        assert!(p1 != p2);
-        assert!(p1 != p3);
-        assert!(p1 == p1_eq);
+        assert_relative_ne!(p1, p2);
+        assert_relative_ne!(p1, p3);
+        assert_relative_eq!(p1, p1_eq);
     }
 
     #[test]

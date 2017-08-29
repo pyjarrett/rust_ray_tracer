@@ -7,7 +7,7 @@ const MIN_LENGTH_FOR_NORMALIZATION: f32 = 1e-6;
 const NORMALIZED_EPS: f32 = 1e-6;
 
 /// A 3 dimensional vector.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Vector {
     pub x: f32,
     pub y: f32,

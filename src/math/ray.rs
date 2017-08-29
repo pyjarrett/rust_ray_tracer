@@ -2,7 +2,7 @@ use math::Point;
 use math::Vector;
 use std::fmt;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct Ray {
     pub origin: Point,
     pub direction: Vector,
