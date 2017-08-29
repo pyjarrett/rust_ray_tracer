@@ -1,5 +1,4 @@
 use approx::ApproxEq;
-use std::cmp::Eq;
 use std::fmt;
 use std::convert::From;
 use std::ops::{Add, Sub, Mul, Index};
@@ -73,8 +72,6 @@ impl PartialEq for Point {
              relative_eq!(other.z, self.z))
     }
 }
-
-impl Eq for Point {}
 
 
 impl From<Point> for Vector {
