@@ -58,9 +58,7 @@ mod tests {
 
         if let Some(intersection) = x_at_7.intersect(&ray) {
             assert_relative_eq!(intersection.time, expected_t);
-            assert_relative_eq!(intersection.point.x, expected_p.x);
-            assert_relative_eq!(intersection.point.y, expected_p.y);
-            assert_relative_eq!(intersection.point.z, expected_p.z);
+            assert_relative_eq!(intersection.point, expected_p);
         } else {
             panic!("Couldn't find intersection of ray and plane!");
         }
