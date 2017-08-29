@@ -1,6 +1,7 @@
+use approx::ApproxEq;
 use std::ops::{Add, AddAssign, Sub, Mul, Div, Neg, Index};
 use std::fmt;
-use math::Axis;
+use math::{Axis, XYZ};
 
 // TODO: Move these into an approximation library.
 const MIN_LENGTH_FOR_NORMALIZATION: f32 = 1e-6;
@@ -131,6 +132,45 @@ impl Index<Axis> for Vector {
             Axis::Y => &self.y,
             Axis::Z => &self.z,
         }
+    }
+}
+
+impl ApproxEq for Vector {
+    type Epsilon = <f32 as ApproxEq>::Epsilon;
+
+    fn default_epsilon() -> Self::Epsilon {
+        f32::default_epsilon()
+    }
+
+    fn default_max_relative() -> Self::Epsilon {
+        f32::default_max_relative()
+    }
+
+    fn default_max_ulps() -> u32 {
+        f32::default_max_ulps()
+    }
+
+    fn relative_eq(
+        &self,
+        other: &Self,
+        epsilon: Self::Epsilon,
+        max_relative: Self::Epsilon,
+    ) -> bool {
+        for axis in &XYZ {
+            if !f32::relative_eq(&self[*axis], &other[*axis], epsilon, max_relative) {
+                return false;
+            }
+        }
+        true
+    }
+
+    fn ulps_eq(&self, other: &Self, epsilon: Self::Epsilon, max_ulps: u32) -> bool {
+        for axis in &XYZ {
+            if !f32::ulps_eq(&self[*axis], &other[*axis], epsilon, max_ulps) {
+                return false;
+            }
+        }
+        true
     }
 }
 
