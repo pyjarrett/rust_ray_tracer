@@ -29,9 +29,31 @@ fn render_multiple_spheres() {
     write_image(image, "scene.png");
 }
 
+fn print_view_frustum_corners(film: &Film, camera: &Camera, near: f32, far: f32) {
+    // Print the corners of the view frustum
+    println!("Rendered world outer points.");
+    let corners = [
+        (0, film.width() as u32),
+        (0, 0),
+        (film.height() as u32, 0),
+        (film.height() as u32, film.width() as u32),
+    ];
+
+    for &pair in corners.iter() {
+        let ray = camera.generate_ray(pair.0, pair.1);
+        println!("{} {} {}", pair.0, pair.1, ray.at(near));
+        println!("{} {} {}", pair.0, pair.1, ray.at(far));
+    }
+}
+
 fn create_default_camera(film: &Film) -> Camera {
-    let projection = Perspective::new(1.0, 1000.0, PlanarAngle::Degrees(90.0));
-    Camera::new(film, &projection)
+    let near = 1.0;
+    let far = 1000.0;
+    let projection = Perspective::new(near, far, PlanarAngle::Degrees(90.0));
+    let c = Camera::new(film, &projection);
+
+    print_view_frustum_corners(film, &c, near, far);
+    c
 }
 
 fn build_scene() -> Scene {
@@ -43,15 +65,15 @@ fn build_scene() -> Scene {
     )));
 
     scene.add_entity(
-        Box::new(Sphere::new_with_radius(0.1)),
+        Box::new(Sphere::new_with_radius(10.0)),
         Box::new(LambertianMaterial::new(&Vector::new(0.0, 0.0, 1.0))),
         Matrix4x4::translate(0.0, 0.0, 30.0),
     );
 
     scene.add_entity(
-        Box::new(Sphere::new_with_radius(0.1)),
+        Box::new(Sphere::new_with_radius(10.0)),
         Box::new(LambertianMaterial::new(&Vector::new(1.0, 0.0, 0.0))),
-        Matrix4x4::translate(0.2, 0.4, 30.0),
+        Matrix4x4::translate(20.0, 40.0, 30.0),
     );
 
     scene.add_entity(
@@ -60,12 +82,28 @@ fn build_scene() -> Scene {
         Matrix4x4::translate(0.2, 0.0, 30.0),
     );
 
-    /*
     scene.add_light(Box::new(PointLight::new(
         Point::new(0.0, 0.0, 30.0),
         1.0 * Vector::new(1.0, 1.0, 1.0),
     )));
-    */
+
+    scene.add_entity(
+        Box::new(Plane::from_normal_and_point(
+            &Vector::new(1.0, 0.0, 0.0),
+            &Point::new(-40.0, 0.0, 30.0),
+        )),
+        Box::new(LambertianMaterial::new(&Vector::new(0.2, 0.2, 0.2))),
+        Matrix4x4::identity(),
+    );
+
+    scene.add_entity(
+        Box::new(Plane::from_normal_and_point(
+            &Vector::new(0.0, 1.0, 0.0),
+            &Point::new(0.0, -20.0, 30.0),
+        )),
+        Box::new(LambertianMaterial::new(&Vector::new(0.2, 0.2, 0.2))),
+        Matrix4x4::identity(),
+    );
 
     scene.add_entity(
         Box::new(Plane::new(0.0, 0.0, -1.0, 30.5)),

@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-use std::f32::consts::PI;
 use math::{Matrix4x4, Point, Ray};
 use scene::dimensions::{BasicDimensions2, Dimensions2};
 
@@ -103,13 +102,13 @@ impl Perspective {
         assert!(near > 0.0);
         assert!(far > near);
 
-        let fov_radians = match fov {
-            PlanarAngle::Degrees(value) => value.to_radians(),
-            PlanarAngle::Radians(value) => value,
+        let fov_degrees = match fov {
+            PlanarAngle::Degrees(value) => value,
+            PlanarAngle::Radians(value) => value.to_degrees(),
         };
-        assert!(fov_radians > 0.0 && fov_radians < 2.0 * PI);
+        assert!(fov_degrees > 0.0 && fov_degrees < 360.0);
 
-        let projection = Matrix4x4::perspective(near, far, fov_radians);
+        let projection = Matrix4x4::perspective(near, far, fov_degrees);
         Perspective {
             camera_to_screen: projection,
             screen_to_camera: projection.inverse().unwrap(),
