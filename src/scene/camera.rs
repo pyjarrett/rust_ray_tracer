@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use math::{Matrix4x4, Point, Ray};
+use math::{Matrix4x4, PlanarAngle, Point, Ray};
 use scene::dimensions::{BasicDimensions2, Dimensions2};
 
 /// The mapping between the raster (film) and the image plane of the camera.
@@ -72,14 +72,6 @@ impl Dimensions2<u16> for Film {
     }
 }
 
-/// Provides units for planar angles.
-///
-/// We often want to be explicit about the units we're dealing with, so this lets us be explicit.
-pub enum PlanarAngle<T = f32> {
-    Radians(T),
-    Degrees(T),
-}
-
 pub trait Projection {
     fn screen_to_camera(&self) -> &Matrix4x4;
     fn camera_to_screen(&self) -> &Matrix4x4;
@@ -102,13 +94,9 @@ impl Perspective {
         assert!(near > 0.0);
         assert!(far > near);
 
-        let fov_degrees = match fov {
-            PlanarAngle::Degrees(value) => value,
-            PlanarAngle::Radians(value) => value.to_degrees(),
-        };
+        let fov_degrees = fov.to_degrees();
         assert!(fov_degrees > 0.0 && fov_degrees < 360.0);
-
-        let projection = Matrix4x4::perspective(near, far, fov_degrees);
+        let projection = Matrix4x4::perspective(near, far, fov);
         Perspective {
             camera_to_screen: projection,
             screen_to_camera: projection.inverse().unwrap(),

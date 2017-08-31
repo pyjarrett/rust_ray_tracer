@@ -1,7 +1,7 @@
 extern crate approx;
 
 use approx::ApproxEq;
-use math::{Point, Ray, Vector};
+use math::{PlanarAngle, Point, Ray, Vector};
 use std::f32;
 use std::fmt;
 use std::ops::Mul;
@@ -74,17 +74,21 @@ impl Matrix4x4 {
     /// # Arguments
     /// * `near` - Z value of the near plane
     /// * `far` - Z value of far plane
-    /// * `fov_degrees` - field of view in degrees
+    /// * `fov` - field of view in degrees
     ///
     /// # Preconditions
     /// * `0 <= near < far`
-    /// # `0 < fov_degrees < 180 degrees`
-    pub fn perspective(near: f32, far: f32, fov_degrees: f32) -> Matrix4x4 {
+    /// # `0 < fov < 180 degrees`
+    pub fn perspective(near: f32, far: f32, fov: PlanarAngle) -> Matrix4x4 {
         assert!(
             0.0 <= near,
             "The distance to the near plane cannot be negative."
         );
         assert!(near < far, "The near plane must be behind the far plane.");
+        let fov_degrees = match fov {
+            PlanarAngle::Degrees(value) => value,
+            PlanarAngle::Radians(value) => value.to_degrees(),
+        };
         let inv_tan_half_fov = 1.0 / ((fov_degrees.to_radians() / 2.0).tan());
         assert!(
             inv_tan_half_fov > 0.0,
@@ -367,7 +371,7 @@ impl Mul<Ray> for Matrix4x4 {
 #[cfg(test)]
 mod tests {
     use super::Matrix4x4;
-    use math::Point;
+    use math::{PlanarAngle, Point};
 
     #[test]
     pub fn test_identity() {
@@ -406,26 +410,26 @@ mod tests {
     #[test]
     #[should_panic]
     pub fn test_perspective_near_closer_than_far() {
-        Matrix4x4::perspective(100.0, 10.0, 45.0_f32);
+        Matrix4x4::perspective(100.0, 10.0, PlanarAngle::Degrees(45.0_f32));
     }
 
     #[test]
     #[should_panic]
     pub fn test_perspective_near_greater_than_0() {
-        Matrix4x4::perspective(-100.0, 10.0, 45.0_f32);
+        Matrix4x4::perspective(-100.0, 10.0, PlanarAngle::Degrees(45.0_f32));
     }
 
     #[test]
     #[should_panic]
     pub fn test_perspective_fov_less_than_180() {
-        Matrix4x4::perspective(0.0, 100.0, 190.0_f32);
+        Matrix4x4::perspective(0.0, 100.0, PlanarAngle::Degrees(190.0_f32));
     }
 
     #[test]
     pub fn test_perspective_frustrum_points() {
         let near = 10.0;
         let far = 100.0;
-        let p = Matrix4x4::perspective(near, far, 60.0_f32);
+        let p = Matrix4x4::perspective(near, far, PlanarAngle::Degrees(60.0_f32));
 
         let center_near = Point::new(0.0, 0.0, near);
         let center_far = Point::new(0.0, 0.0, far);

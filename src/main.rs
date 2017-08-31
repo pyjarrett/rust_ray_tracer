@@ -6,7 +6,7 @@ use std::fs::File;
 use std::path::Path;
 
 mod math;
-use math::{Axis, Matrix4x4, Plane, Point, Sphere, Vector};
+use math::{Axis, Matrix4x4, PlanarAngle, Plane, Point, Sphere, Vector};
 
 mod scene;
 use scene::*;

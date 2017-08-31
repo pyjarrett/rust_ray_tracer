@@ -23,7 +23,7 @@ pub mod camera;
 pub mod dimensions;
 pub mod nonarea_light;
 pub mod material;
-pub use self::camera::{Camera, Film, Perspective, PlanarAngle, Projection};
+pub use self::camera::{Camera, Film, Perspective, Projection};
 use self::nonarea_light::NonAreaLight;
 use self::material::Material;
 

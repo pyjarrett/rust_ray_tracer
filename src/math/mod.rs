@@ -1,6 +1,7 @@
 //! Mathematics module.
 #![allow(dead_code)]
 mod aabb;
+mod angle;
 mod axis;
 mod intersection;
 mod matrix;
@@ -10,6 +11,7 @@ mod ray;
 mod sphere;
 mod vector;
 pub use self::aabb::AABB;
+pub use self::angle::PlanarAngle;
 pub use self::axis::Axis;
 pub use self::axis::XYZ;
 pub use self::intersection::{Intersection, Solid};
