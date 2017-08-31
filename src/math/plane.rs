@@ -1,4 +1,4 @@
-use math::{Intersection, Ray, Solid, Vector};
+use math::{Intersection, Point, Ray, Solid, Vector};
 
 /// An infinitely stretching plane defined by a normal, and the distance from the coordinate system
 /// origin to the plane.
@@ -13,8 +13,33 @@ pub struct Plane {
 
 impl Plane {
     pub fn new(a: f32, b: f32, c: f32, d: f32) -> Plane {
-        assert_relative_eq!(a * a + b * b + c * c, 1.0);
         Plane { a, b, c, d }
+    }
+
+    /// Plane defined using `x0` from `n.dot(x - x0) == 0`.
+    /// Thus, `d = -x0.dot(n)`
+    pub fn from_normal_and_point(normal: &Vector, point: &Point) -> Plane {
+        assert!(normal.is_normalized());
+
+        Plane::new(
+            normal.x,
+            normal.y,
+            normal.z,
+            -normal.dot(&Vector::from(*point)),
+        )
+    }
+
+    pub fn normal(&self) -> Vector {
+        let mut n = Vector::new(self.a, self.b, self.c);
+        n.normalize().expect(
+            "Cannot create a normal vector for the plane",
+        );
+        n
+    }
+
+    pub fn distance_to_point(&self, point: &Point) -> f32 {
+        ((self.a * point.x + self.b * point.y + self.c * point.z + self.d) /
+             f32::sqrt(self.a * self.a + self.b * self.b + self.c * self.c)).abs()
     }
 }
 
@@ -45,6 +70,26 @@ impl Solid for Plane {
 mod tests {
     use math::{Ray, Point, Solid, Vector};
     use super::Plane;
+
+    #[test]
+    fn test_normal() {
+        let px = Plane::new(4.0, 0.0, 0.0, 0.0);
+        assert_relative_eq!(px.normal(), Vector::new(1.0, 0.0, 0.0));
+
+        let py = Plane::new(0.0, -4.0, 0.0, 0.0);
+        assert_relative_eq!(py.normal(), Vector::new(0.0, -1.0, 0.0));
+    }
+
+    #[test]
+    fn test_from_normal_and_point() {
+        let normal = Vector::new(1.0, 0.0, 0.0);
+        let point = Point::new(4.0, 0.0, 0.0);
+        let p = Plane::from_normal_and_point(&normal, &point);
+        assert_relative_eq!(p.normal(), normal);
+        assert_relative_eq!(p.distance_to_point(&Point::new(4.0, 15.0, 20.0)), 0.0);
+        assert_relative_eq!(p.distance_to_point(&Point::new(4.0, 20.0, 50.0)), 0.0);
+        assert_relative_eq!(p.distance_to_point(&Point::new(3.0, 20.0, 50.0)), 1.0);
+    }
 
     #[test]
     fn test_intersection() {
