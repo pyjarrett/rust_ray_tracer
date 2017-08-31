@@ -150,6 +150,7 @@ impl ApproxEq for Vector {
         f32::default_max_ulps()
     }
 
+    /// Determines relative equality based on the difference along each axis independently.
     fn relative_eq(
         &self,
         other: &Self,
@@ -184,6 +185,23 @@ impl fmt::Display for Vector {
 #[cfg(test)]
 mod tests {
     use super::Vector;
+
+    #[test]
+    fn test_relative_equality() {
+        assert_relative_ne!(Vector::new(1.0, 2.0, 3.0), Vector::new(4.0, 5.0, 3.0));
+        assert_relative_ne!(Vector::new(4.0, 2.0, 3.0), Vector::new(4.0, 5.0, 3.0));
+        assert_relative_eq!(Vector::new(1.0, 2.0, 3.0), Vector::new(1.0, 2.0, 3.0));
+        assert_relative_eq!(
+            Vector::new(1.0, 2.0, 3.0),
+            Vector::new(1.0, 2.0, 3.099),
+            max_relative = 0.1
+        );
+        assert_relative_ne!(
+            Vector::new(1.0, 2.0, 3.0),
+            Vector::new(1.0, 2.0, 3.160),
+            max_relative = 0.05
+        );
+    }
 
     #[test]
     fn test_vector_length() {
@@ -257,38 +275,29 @@ mod tests {
         let v1 = Vector::new(4.0, 5.0, 6.0);
         let v2 = Vector::new(3.0, 2.0, 1.0);
         let v3 = v1 - v2;
-        assert_relative_eq!(v3.x, 1.0);
-        assert_relative_eq!(v3.y, 3.0);
-        assert_relative_eq!(v3.z, 5.0);
+        assert_relative_eq!(v3, Vector::new(1.0, 3.0, 5.0));
     }
 
     #[test]
     fn test_vector_mul() {
         let v1 = Vector::new(1.0, 2.0, 3.0);
         let v2 = 7.0 * v1;
-        assert_relative_eq!(v2.x, 7.0);
-        assert_relative_eq!(v2.y, 14.0);
-        assert_relative_eq!(v2.z, 21.0);
+        assert_relative_eq!(v2, Vector::new(7.0, 14.0, 21.0));
     }
 
     #[test]
     fn test_vector_div() {
         let v1 = Vector::new(10.0, 12.0, 0.0);
         let v2 = v1 / 2.0;
-        assert_relative_eq!(v2.x, 5.0);
-        assert_relative_eq!(v2.y, 6.0);
-        assert_relative_eq!(v2.z, 0.0);
+        assert_relative_eq!(v1, Vector::new(10.0, 12.0, 0.0));
+        assert_relative_eq!(v2, Vector::new(5.0, 6.0, 0.0));
     }
 
     #[test]
     fn test_vector_neg() {
         let v1 = Vector::new(1.0, -2.0, 0.0);
         let v2 = -v1;
-        assert_relative_eq!(v1.x, 1.0);
-        assert_relative_eq!(v1.y, -2.0);
-        assert_relative_eq!(v1.z, 0.0);
-        assert_relative_eq!(v2.x, -1.0);
-        assert_relative_eq!(v2.y, 2.0);
-        assert_relative_eq!(v2.z, 0.0);
+        assert_relative_eq!(v1, Vector::new(1.0, -2.0, 0.0));
+        assert_relative_eq!(v2, Vector::new(-1.0, 2.0, 0.0));
     }
 }
