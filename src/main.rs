@@ -22,6 +22,7 @@ type ColorImage = image::ImageBuffer<image::Rgb<u8>, std::vec::Vec<u8>>;
 
 fn render_multiple_spheres() {
     let film = Film::new(800, 600);
+    //let film = Film::new(3840, 2160); (4K)
     let mut image = ColorImage::new(film.width() as u32, film.height() as u32);
 
     ray_cast(create_default_camera(&film), build_scene(), &mut image);

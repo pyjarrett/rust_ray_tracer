@@ -55,6 +55,11 @@ impl Vector {
         self.x * v.x + self.y * v.y + self.z * v.z
     }
 
+    pub fn reflect(&self, n: &Vector) -> Vector {
+        let incident = self.clone();
+        incident - 2.0 * n.dot(&incident) * (*n)
+    }
+
     /// The angle between two vectors in degrees in the range [0, 180].
     pub fn angle_with_in_degrees(&self, v: Vector) -> f32 {
         let mut a = self.clone();

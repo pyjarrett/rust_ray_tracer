@@ -117,10 +117,27 @@ impl Scene {
     /// # Returns
     /// * `Spectrum` - the radiance along this ray in the opposite direction.
     pub fn trace(&self, ray: &Ray) -> Spectrum {
+        self.bounce(ray, 8)
+    }
+
+    fn bounce(&self, ray: &Ray, bounces_left: u32) -> Spectrum {
         // If no entity was intersected, return black.
         // This might be changed to account for other types of ambient light.
         match self.intersect(ray) {
-            Some(si) => self.radiance_from(ray, si.entity, &si.intersection),
+            Some(si) => {
+                if bounces_left == 0 {
+                    return Vector::new(0.0, 0.0, 0.0);
+                }
+                let min_surface_distance = 0.01;
+                let new_direction = ray.direction.reflect(&si.intersection.normal);
+                let new_origin = si.intersection.point + min_surface_distance * new_direction;
+                let next_ray = Ray {
+                    origin: new_origin,
+                    direction: new_direction,
+                };
+                return self.radiance_from(ray, si.entity, &si.intersection) +
+                    self.bounce(&next_ray, bounces_left - 1);
+            }
             None => Vector::new(0.0, 0.0, 0.),
         }
     }
