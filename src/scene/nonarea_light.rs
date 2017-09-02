@@ -76,15 +76,8 @@ impl PointLight {
 impl NonAreaLight for PointLight {
     fn irradiance(&self, position: &Point, normal: &Vector) -> Spectrum {
         let distance = position.distance_to(self.position);
-        let e = self.light_vector(position).dot(normal).max(0.0) * self.intensity /
+        self.light_vector(position).dot(normal).max(0.0) * self.intensity /
             (distance * distance).min(1.0);
-
-        //println!("light vector {}", light_vector);
-        //println!("position {}", position);
-        //println!("normal {}", normal);
-        //println!("distance*distance {}", distance * distance);
-        //println!("e={}", e);
-        e
     }
 
     #[allow(unused_variables)]
