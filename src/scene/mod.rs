@@ -64,6 +64,12 @@ pub struct Transform {
     pub to_world: Matrix4x4,
 }
 
+/// An intersection which occurred on the scene.
+struct SceneIntersection<'a> {
+    pub entity: &'a Box<Entity>,
+    pub intersection: Intersection,
+}
+
 pub struct Scene {
     lights: Vec<Box<NonAreaLight>>,
     entities: Vec<Box<Entity>>,
@@ -111,7 +117,16 @@ impl Scene {
     /// # Returns
     /// * `Spectrum` - the radiance along this ray in the opposite direction.
     pub fn trace(&self, ray: &Ray) -> Spectrum {
-        // Find the closest entity being intersected.
+        // If no entity was intersected, return black.
+        // This might be changed to account for other types of ambient light.
+        match self.intersect(ray) {
+            Some(si) => self.radiance_from(ray, si.entity, &si.intersection),
+            None => Vector::new(0.0, 0.0, 0.),
+        }
+    }
+
+    /// Finds the object and intersection point if a ray hits something.
+    fn intersect(&self, ray: &Ray) -> Option<SceneIntersection> {
         let mut closest_object: Option<&Box<Entity>> = None;
         let mut closest_intersection: Option<Intersection> = None;
         let mut best_time: f32 = INFINITY;
@@ -127,11 +142,12 @@ impl Scene {
             }
         }
 
-        // If no entity was intersected, return black.
-        // This might be changed to account for other types of ambient light.
         match closest_object {
-            None => Vector::new(0.0, 0.0, 0.),
-            Some(obj) => self.radiance_from(ray, obj, &closest_intersection.unwrap()),
+            Some(object) => Some(SceneIntersection {
+                entity: object,
+                intersection: closest_intersection.unwrap(),
+            }),
+            None => None,
         }
     }
 
@@ -146,17 +162,29 @@ impl Scene {
         // Sum the contributions from all lights.
         let mut radiance = Vector::new(0.0, 0.0, 0.0);
         for ref light in self.lights.iter() {
-            // TODO: Add direction check to light.
+            const PREVENT_SELF_INTERSECTION_RANGE: f32 = 0.01;
+            let light_vector = light.light_vector(&intersection.point);
+            let shadow_intersection = self.intersect(&Ray {
+                origin: intersection.point + (PREVENT_SELF_INTERSECTION_RANGE * light_vector),
+                direction: light_vector,
+            });
+            let light_hidden = match shadow_intersection {
+                Some(si) => light.is_hidden_from(&intersection.point, Some(si.intersection.time)),
+                None => light.is_hidden_from(&intersection.point, None),
+            };
 
-            // Determine if we can even see this light from the intersection point.
-
-            // Get the "light vector" pointing to the light.
-            // FIXME: this is wrong
-            radiance += entity.material.f(
-                // TODO: get direction to light.
-                &intersection.normal,
-                &-ray.direction,
-            ) * light.irradiance(&intersection.point, &intersection.normal)
+            if !light_hidden {
+                // Determine if we can even see this light from the intersection point.
+                // FIXME: this is wrong, and is just a guess-timate, and not physically accurate.
+                radiance += entity.material.f(
+                    // TODO: get direction to light.
+                    &-light_vector,
+                    &-ray.direction,
+                ) *
+                    light.irradiance(&intersection.point, &intersection.normal)
+            } else {
+                //radiance += Vector::new(0.0, 0.0, 0.5);
+            }
         }
         radiance
     }

@@ -59,55 +59,41 @@ fn create_default_camera(film: &Film) -> Camera {
 fn build_scene() -> Scene {
     let mut scene = Scene::new();
 
+    // LIGHTS!
     scene.add_light(Box::new(DirectionalLight::new(
         &Vector::new(0.0, -1.0, 0.0),
         &Vector::new(1.0, 1.0, 1.0),
     )));
 
+    scene.add_light(Box::new(PointLight::new(
+        Point::new(0.0, 20.0, 30.0),
+        1.0 * Vector::new(1.0, 1.0, 1.0),
+    )));
+
+    // OBJECTS
     scene.add_entity(
-        Box::new(Sphere::new_with_radius(10.0)),
-        Box::new(LambertianMaterial::new(&Vector::new(0.0, 0.0, 1.0))),
+        Box::new(Sphere::new_with_radius(5.0)),
+        Box::new(LambertianMaterial::new(&Vector::new(1.0, 1.0, 1.0))),
         Matrix4x4::translate(0.0, 0.0, 30.0),
     );
 
     scene.add_entity(
-        Box::new(Sphere::new_with_radius(10.0)),
-        Box::new(LambertianMaterial::new(&Vector::new(1.0, 0.0, 0.0))),
-        Matrix4x4::translate(20.0, 40.0, 30.0),
+        Box::new(Sphere::new_with_radius(5.0)),
+        Box::new(LambertianMaterial::new(&Vector::new(1.0, 1.0, 1.0))),
+        Matrix4x4::translate(0.0, 10.0, 30.0),
     );
-
     scene.add_entity(
-        Box::new(Sphere::new_with_radius(0.1)),
-        Box::new(LambertianMaterial::new(&Vector::new(1.0, 0.0, 0.0))),
-        Matrix4x4::translate(0.2, 0.0, 30.0),
-    );
-
-    scene.add_light(Box::new(PointLight::new(
-        Point::new(0.0, 0.0, 30.0),
-        1.0 * Vector::new(1.0, 1.0, 1.0),
-    )));
-
-    scene.add_entity(
-        Box::new(Plane::from_normal_and_point(
-            &Vector::new(1.0, 0.0, 0.0),
-            &Point::new(-40.0, 0.0, 30.0),
-        )),
-        Box::new(LambertianMaterial::new(&Vector::new(0.2, 0.2, 0.2))),
-        Matrix4x4::identity(),
+        Box::new(Sphere::new_with_radius(5.0)),
+        Box::new(LambertianMaterial::new(&Vector::new(1.0, 1.0, 1.0))),
+        Matrix4x4::translate(10.0, 0.0, 30.0),
     );
 
     scene.add_entity(
         Box::new(Plane::from_normal_and_point(
             &Vector::new(0.0, 1.0, 0.0),
-            &Point::new(0.0, -20.0, 30.0),
+            &Point::new(0.0, -5.0, 30.0),
         )),
         Box::new(LambertianMaterial::new(&Vector::new(0.2, 0.2, 0.2))),
-        Matrix4x4::identity(),
-    );
-
-    scene.add_entity(
-        Box::new(Plane::new(0.0, 0.0, -1.0, 30.5)),
-        Box::new(LambertianMaterial::new(&Vector::new(1.0, 1.0, 1.0))),
         Matrix4x4::identity(),
     );
 
