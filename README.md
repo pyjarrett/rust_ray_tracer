@@ -29,7 +29,26 @@ Follow the [Rust API Guidelines](https://github.com/brson/rust-api-guidelines).
 
 ## f32 vs f64 use
 
+I have ended up binding myself to using of `f32` and other types such as u16 to
+the `Dimension` type.
+
 ## Precision issues
+
+# Lessons Learned
+
+- Use templates instead of `f32`
+- Use `copy` for cheap types, rather than pass by references.
+- Start bench marking early.
+- Should I have used ray bounds?  PBRT uses them, but I haven't had a use for
+  them yet.
+- Prefer to hide types, unless they're immediately needed elsewhere.
+- I feel like I should have shared work between the Vector and Point types.
+  (using custom derive or something?)
+- Haven't gotten to make/use "tensors" yet.
+- It is hard to learn a language which is evolving, and stay up to date, while
+  writing software.
+- Learn memory management conventions before working in a language (e.g. Rc, vs
+  Box, etc.)
 
 # References
 
